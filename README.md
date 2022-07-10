@@ -8,7 +8,10 @@ A fork of [@aws-cron-parser](https://www.npmjs.com/package/aws-cron-parser)
 [![codacy](https://app.codacy.com/project/badge/Grade/6c1314916ad54dbfbe1a4698af373883)](https://app.codacy.com/manual/vinhtnguyen/aws-cron-parser/dashboard)
 
 Using aws cron syntax, with a few additional features, to schedule recurring events. Built in Typescript support.
-Supports events with durations (have both a start time and an end time)
+Supports events with durations
+
+Syntax: `min hr dayOfMonth month dayOfWeek year *duration* *recurStart* *recurEnd*`
+values in ** are optional, can be omitted 
 
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
 
@@ -33,10 +36,10 @@ import awsCronParser from "aws-cron-parser";
 const cron = awsCronParser.parse("9 * 7,9,11 5 ? 2020,2022,2024-2099");
 
 // to get the first occurrence from now
-let occurrence = awsCronParser.next(cron, new Date());
+let occurrence = awsCronParser.next(cron, new Date(), 'local');
 
 // to get the next occurrence following the previous one
-occurrence = awsCronParser.next(cron, occurrence);
+occurrence = awsCronParser.next(cron, occurrence, 'UTC');
 
 // and use prev to get the previous occurrence
 occurrence = awsCronParser.prev(cron, occurrence);
