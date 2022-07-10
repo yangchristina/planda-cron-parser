@@ -2,17 +2,19 @@ import { getDaysOfMonthFromDaysOfWeek, getDaysOfMonthForL, getDaysOfMonthForW, a
 import { ParsedCron } from './parse';
 
 let iter: number;
-const findOnce = (parsed: ParsedCron, from: Date, useLocal: boolean): Date | null => {
+const findOnce = (parsed: ParsedCron, from: Date, timezone: string): Date | null => {
     if (iter > 10) {
         throw new Error("AwsCronParser : this shouldn't happen, but iter > 10");
     }
     iter += 1;
 
-    const cYear = useLocal ? from.getFullYear() : from.getUTCFullYear();
-    const cMonth = useLocal ? from.getMonth() + 1 : from.getUTCMonth() + 1;
-    const cDayOfMonth = useLocal ? from.getDate() : from.getUTCDate();
-    const cHour = useLocal ? from.getHours() : from.getUTCHours();
-    const cMinute = useLocal ? from.getMinutes() : from.getUTCMinutes();
+    from = getLatestDate(from, parsed.start)
+
+    const cYear = timezone === 'local' ? from.getFullYear() : from.getUTCFullYear();
+    const cMonth = timezone === 'local' ? from.getMonth() + 1 : from.getUTCMonth() + 1;
+    const cDayOfMonth = timezone === 'local' ? from.getDate() : from.getUTCDate();
+    const cHour = timezone === 'local' ? from.getHours() : from.getUTCHours();
+    const cMinute = timezone === 'local' ? from.getMinutes() : from.getUTCMinutes();
 
     const year = find(parsed.years, (c: number) => c >= cYear);
     if (!year) {
@@ -21,7 +23,7 @@ const findOnce = (parsed: ParsedCron, from: Date, useLocal: boolean): Date | nul
 
     const month = find(parsed.months, (c: number) => c >= (year === cYear ? cMonth : 1));
     if (!month) {
-        return findOnce(parsed, useLocal ? new Date(year + 1, 0) : new Date(Date.UTC(year + 1, 0)), useLocal);
+        return findOnce(parsed, getDate(timezone, year + 1, 1), timezone);
     }
 
     const isSameMonth = year === cYear && month === cMonth;
@@ -37,23 +39,48 @@ const findOnce = (parsed: ParsedCron, from: Date, useLocal: boolean): Date | nul
 
     const dayOfMonth = find(pDaysOfMonth, (c: number) => c >= (isSameMonth ? cDayOfMonth : 1));
     if (!dayOfMonth) {
-        return findOnce(parsed, useLocal ? new Date(year, month + 1 - 1) : new Date(Date.UTC(year, month + 1 - 1)), useLocal);
+        return findOnce(parsed, getDate(timezone, year, month + 1), timezone);
     }
 
     const isSameDate = isSameMonth && dayOfMonth === cDayOfMonth;
 
     const hour = find(parsed.hours, (c: number) => c >= (isSameDate ? cHour : 0));
     if (typeof hour === 'undefined') {
-        return findOnce(parsed, useLocal ? new Date(year, month - 1, dayOfMonth + 1) : new Date(Date.UTC(year, month - 1, dayOfMonth + 1)), useLocal);
+        return findOnce(parsed,
+            getDate(timezone, year, month, dayOfMonth + 1), timezone);
     }
 
     const minute = find(parsed.minutes, (c: number) => c >= (isSameDate && hour === cHour ? cMinute : 0));
     if (typeof minute === 'undefined') {
-        return findOnce(parsed, useLocal ? new Date(year, month - 1, dayOfMonth, hour + 1) : new Date(Date.UTC(year, month - 1, dayOfMonth, hour + 1)), useLocal);
+        return findOnce(parsed, getDate(timezone, year, month, dayOfMonth, hour + 1, minute), timezone);
     }
 
-    return useLocal ? new Date(year, month - 1, dayOfMonth, hour, minute) : new Date(Date.UTC(year, month - 1, dayOfMonth, hour, minute));
+    return getDate(timezone, year, month, dayOfMonth, hour, minute);
 };
+
+// function getEarliestDate(date1: Date, date2: Date) {
+//     return date1.getTime() <= date2.getTime() ? date1 : date2
+// }
+
+function getLatestDate(date1: Date, date2: Date) {
+    return date1.getTime() >= date2.getTime() ? date1 : date2
+}
+
+function getDate(tz: string, year = 0, month = 1, dayOfMonth = 1, hour = 0, minute = 0) {
+    try {
+        switch (tz.toLowerCase()) {
+            case 'local':
+                return new Date(year, month - 1, dayOfMonth, hour, minute)
+            default: // default is 'utc'
+                return new Date(Date.UTC(year, month - 1, dayOfMonth, hour, minute))
+        }
+    } catch (e) {
+        console.error('get date error')
+        console.error(e)
+        console.error(tz)
+        return new Date(0)
+    }
+}
 
 /**
  * generate the next occurrence AFTER the "from" date value , <--- changed from AFTER to INCLUDING
@@ -61,11 +88,16 @@ const findOnce = (parsed: ParsedCron, from: Date, useLocal: boolean): Date | nul
  * @param {*} parsed the value returned by "parse" function of this module
  * @param {*} from the Date to start from
  */
-export function next(parsed: ParsedCron, from: Date, useLocal = false) {
+export function next(parsed: ParsedCron, from: Date, timezone = 'utc') {
     // iter is just a safety net to prevent infinite recursive calls
     // because I'm not 100% sure this won't happen
     iter = 0;
-    return findOnce(parsed, new Date((Math.floor(from.getTime() / 60000) + 1) * 60000), useLocal
-        // new Date((Math.floor(from.getTime() / 60000) + 1) * 60000)
-    );
+    const nextOccurence = findOnce(parsed, new Date((Math.floor(from.getTime() / 60000) + 1) * 60000), timezone.toLowerCase())
+    if (
+        nextOccurence === null
+        || parsed.end === null
+        || nextOccurence.getTime() + parsed.duration < parsed.end.getTime()
+    ) return nextOccurence
+    return null
+    // new Date((Math.floor(from.getTime() / 60000) + 1) * 60000)
 }

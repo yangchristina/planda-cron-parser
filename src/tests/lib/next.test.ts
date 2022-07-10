@@ -20,7 +20,7 @@ test('chris tries to test #1', () => {
         let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe, i) => {
             logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() )?.toString()}` });
-            occurence = AwsCronParser.next(parsed, new Date(occurence.getTime() ), true) || new Date(0);
+            occurence = AwsCronParser.next(parsed, new Date(occurence.getTime() ), 'local') || new Date(0);
             logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
             logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
             expect(occurence?.toString()).toBe(itShouldBe);

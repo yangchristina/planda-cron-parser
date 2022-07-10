@@ -7,7 +7,9 @@ export interface ParsedCron {
     months: ParsedRule;
     daysOfWeek: ParsedRule;
     years: ParsedRule;
-    duration?: number
+    duration: number,
+    start: Date, // this should affect years
+    end: Date | null,
 }
 
 const parseIntMinMax = (str: string, min: number, max: number): number => {
@@ -112,7 +114,7 @@ const dayWeekReplaces = [
     ['SAT', '7'],
 ];
 
-export function parse(cron: string): ParsedCron {
+export function parse(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
     const rules = cron.split(' ');
 
     return {
@@ -122,6 +124,8 @@ export function parse(cron: string): ParsedCron {
         months: parseOneRule(replace(rules[3], monthReplaces), 1, 12),
         daysOfWeek: parseOneRule(replace(rules[4], dayWeekReplaces), 1, 7),
         years: parseOneRule(rules[5], 1970, 2199),
-        duration: parseInt(rules[6])
+        duration: rules.length >= 7 ? parseInt(rules[6]) : 0,
+        start: start ? new Date(start) : new Date(0),
+        end: end ? new Date(end) : null
     };
 }
