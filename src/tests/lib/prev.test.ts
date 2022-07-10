@@ -4,7 +4,7 @@ import { logger } from '../logger';
 test('should generate multiple previous occurences', () => {
     const crons: { cron: string; should: string[] }[] = [
         {
-            cron: '23,24,25 17,18 25 MAR/4 ? 2019,2020,2021,2023,2028',
+            cron: '23,24,25 17,18 25 MAR/4 ? 2019,2020,2021,2023,2028 3600000',
             should: [
                 'Wed, 25 Mar 2020 18:25:00 GMT',
                 'Wed, 25 Mar 2020 18:24:00 GMT',
@@ -18,7 +18,7 @@ test('should generate multiple previous occurences', () => {
                 'Mon, 25 Nov 2019 17:25:00 GMT',
             ],
         },
-    ];
+    ]
 
     crons.forEach(({ cron, should: theyShouldBe }) => {
         const parsed = AwsCronParser.parse(cron);

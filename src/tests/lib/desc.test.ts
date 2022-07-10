@@ -22,7 +22,10 @@ test('should generate readable schedule description', () => {
             '15,45 6 ? 3,6,8 TUE,THU,SAT *',
             'twice a day, every Tuesday, Thursday, and Saturday in March, June, and August',
         ],
-    ];
+    ].map(cron=> {
+        cron[0] += ' 3600000'
+        return cron
+    });
 
     crons.forEach(([cron, itShouldBe]) => {
         const parsed = AwsCronParser.parse(cron);

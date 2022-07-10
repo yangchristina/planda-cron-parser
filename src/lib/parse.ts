@@ -7,6 +7,7 @@ export interface ParsedCron {
     months: ParsedRule;
     daysOfWeek: ParsedRule;
     years: ParsedRule;
+    duration?: number
 }
 
 const parseIntMinMax = (str: string, min: number, max: number): number => {
@@ -15,6 +16,7 @@ const parseIntMinMax = (str: string, min: number, max: number): number => {
     return num;
 };
 
+// example rules: 'L' '1,2'
 const parseOneRule = (rule: string, min: number, max: number): ParsedRule => {
     if (rule === '?') {
         return [];
@@ -120,5 +122,6 @@ export function parse(cron: string): ParsedCron {
         months: parseOneRule(replace(rules[3], monthReplaces), 1, 12),
         daysOfWeek: parseOneRule(replace(rules[4], dayWeekReplaces), 1, 7),
         years: parseOneRule(rules[5], 1970, 2199),
+        duration: parseInt(rules[6])
     };
 }
