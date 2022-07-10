@@ -1,4 +1,4 @@
-# Planda Recuring Events Cron Parser
+# Recuring Events Cron Parser
 
 A fork of [@aws-cron-parser](https://www.npmjs.com/package/aws-cron-parser)
 
@@ -10,8 +10,8 @@ A fork of [@aws-cron-parser](https://www.npmjs.com/package/aws-cron-parser)
 Using aws cron syntax, with a few additional features, to schedule recurring events. Built in Typescript support.
 Supports events with durations
 
-Syntax: `min hr dayOfMonth month dayOfWeek year *duration* *recurStart* *recurEnd*`
-values in ** are optional, can be omitted 
+Syntax: `min hr dayOfMonth month dayOfWeek year *recurStart* *recurEnd* *duration*`
+values in ** are optional, can be omitted, howevever to use recurEnd, you must use recurStart, and to use duration, you must include values for recurStart and recurEnd
 
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
 
