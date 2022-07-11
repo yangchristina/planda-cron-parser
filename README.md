@@ -1,6 +1,6 @@
 # Recuring Events Cron Parser
 
-A fork of [@aws-cron-parser](https://www.npmjs.com/package/aws-cron-parser)
+A fork of [@aws-cron-parser](https://github.com/beemhq/aws-cron-parser.git)
 
 NOTE: class not tested yet, use at own discretion
 
