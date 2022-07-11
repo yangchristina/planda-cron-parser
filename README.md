@@ -7,6 +7,8 @@ A fork of [@aws-cron-parser](https://www.npmjs.com/package/aws-cron-parser)
 [![benchmark](https://img.shields.io/badge/benchmark-129%2C287%20ops%2Fsec-informational)](https://runkit.com/vinhtnguyen/aws-cron-parser---benchmark)
 [![codacy](https://app.codacy.com/project/badge/Grade/6c1314916ad54dbfbe1a4698af373883)](https://app.codacy.com/manual/vinhtnguyen/aws-cron-parser/dashboard)
 
+NOTE: class not tested yet, use at own discretion
+
 Using aws cron syntax, with a few additional features, to schedule recurring events. Built in Typescript support.
 Supports events with durations, and can pass a time interval into parser that specifies the time range the cron can occur in.
 
