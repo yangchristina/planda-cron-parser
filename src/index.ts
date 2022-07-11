@@ -9,7 +9,7 @@ import { next } from './lib/next';
 
 class AwsCronParser {
     parsedCron: ParsedCron;
-    prevDate: Date | null;
+    #prevDate: Date | null;
     earliestDate: Date;
     latestDate: Date | null;
     timezone = 'local'
@@ -18,7 +18,7 @@ class AwsCronParser {
         this.parsedCron = parse(cron, start, end);
         this.earliestDate = start ? new Date(start) : new Date(0);
         this.latestDate = end ? new Date(end) : null;
-        this.prevDate = new Date(0)
+        this.#prevDate = new Date(0)
         if (tz) this.timezone = tz
     }
 
@@ -29,9 +29,9 @@ class AwsCronParser {
     // if from is given, return next after or equal to from date
     // if from not given, give next after prev, prev is initialized as new Date(0)
     next(from?: Date | number) {
-        if (from !== undefined) this.prevDate = next(this.parsedCron, new Date(from), this.timezone) // including from
-        else if (this.prevDate) this.prevDate = next(this.parsedCron, new Date(this.prevDate.getTime() + this.parsedCron.duration + 60000), this.timezone)
-        return this.prevDate;
+        if (from !== undefined) this.#prevDate = next(this.parsedCron, new Date(from), this.timezone) // including from
+        else if (this.#prevDate) this.#prevDate = next(this.parsedCron, new Date(this.#prevDate.getTime() + this.parsedCron.duration + 60000), this.timezone)
+        return this.#prevDate;
     }
 
     // TODO !!!
@@ -56,10 +56,6 @@ class AwsCronParser {
 
     isInRange(start: number | Date, end: number | Date) {
         return this.range(start, end).length > 0
-    }
-
-    getParsedCron() {
-        return this.parsedCron
     }
 }
 // { ...parse, ...next, ...prev, ...desc }
