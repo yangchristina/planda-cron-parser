@@ -9,7 +9,7 @@ Supports events with durations, and can pass a time interval into parser that sp
 
 Typescript support.
 
-Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `
+Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `  
 values in ** are optional, can be omitted
 
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
@@ -26,13 +26,13 @@ npm install event-cron-parser
 
 ## Usage
 
-There are only 4 methods so far: `parse`, `next`, `range`, `isInRange`
+There are only 5 methods so far: `parse`, `next`, `range`, `isInRange`, `getParsedCron`  
 `prev` will (probably) be added at a later date
 
 ```js
 import AwsCronParser from "aws-cron-parser";
 
-const duration = 3600000
+const duration = 3600000 // in milliseconds
 
 // first we need to parse the cron expression, can also include an earliest possible date and a latest possible date
 const cronParser = new AwsCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000), 'local') // default tz is 'local', can use setTimezone to change, or pass into constructor, only timezones currently supported are local and utc (default)
