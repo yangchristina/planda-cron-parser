@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "./built",
-        "target": "es5",
+        "target": "es6",
         "lib": ["esnext", "es2018"],
         "module": "commonjs",
         "esModuleInterop": true,
