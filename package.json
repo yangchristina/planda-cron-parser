@@ -1,7 +1,7 @@
 {
     "name": "event-cron-parser",
     "version": "1.0",
-    "description": "A util to parse cron expressions with aws cron syntax, with a few additional features including durations, and a start and end for the event, to schedule recurring events.",
+    "description": "A util to parse recurring events scheduled using cron-like syntax. Uses aws cron syntax, with a few additional features including durations, and limits on earliest and latest possible dates for the cron expression",
     "keywords": [
         "aws",
         "cron",
@@ -13,7 +13,7 @@
     "author": "Christina Yang",
     "repository": {
         "type": "git",
-        "url": "https://github.com/beemhq/aws-cron-parser.git"
+        "url": "https://github.com/yangchristina/event-cron-parser.git"
     },
     "type": "commonjs",
     "main": "built/index.js",
