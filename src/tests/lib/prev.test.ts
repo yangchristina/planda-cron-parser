@@ -1,5 +1,5 @@
-import AwsCronParser from '../..';
 import { logger } from '../logger';
+import { prev, parse } from '../..';
 
 test('should generate multiple previous occurences', () => {
     const crons: { cron: string; should: string[] }[] = [
@@ -21,10 +21,10 @@ test('should generate multiple previous occurences', () => {
     ]
 
     crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = AwsCronParser.parse(cron);
+        const parsed = parse(cron);
         let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = AwsCronParser.prev(parsed, occurence) || new Date(0);
+            occurence = prev(parsed, occurence) || new Date(0);
             logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });

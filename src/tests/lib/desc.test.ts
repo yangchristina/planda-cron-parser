@@ -1,5 +1,5 @@
-import AwsCronParser from '../..';
 import { logger } from '../logger';
+import { parse, getScheduleDescription } from '../..';
 
 test('should generate readable schedule description', () => {
     const crons = [
@@ -22,14 +22,14 @@ test('should generate readable schedule description', () => {
             '15,45 6 ? 3,6,8 TUE,THU,SAT *',
             'twice a day, every Tuesday, Thursday, and Saturday in March, June, and August',
         ],
-    ].map(cron=> {
+    ].map(cron => {
         cron[0] += ' 3600000'
         return cron
     });
 
     crons.forEach(([cron, itShouldBe]) => {
-        const parsed = AwsCronParser.parse(cron);
-        const desc = AwsCronParser.getScheduleDescription(parsed);
+        const parsed = parse(cron);
+        const desc = getScheduleDescription(parsed);
         logger.debug(desc, { label: cron });
         expect(desc).toBe(itShouldBe);
     });

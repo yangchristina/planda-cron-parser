@@ -83,7 +83,9 @@ function getDate(tz: string, year = 0, month = 1, dayOfMonth = 1, hour = 0, minu
 }
 
 /**
- * generate the next occurrence AFTER the "from" date value , <--- changed from AFTER to INCLUDING
+ * generate the next occurrence which ends after or at the same time as the "from" date value,
+ * includes occurences that start before the "from" date, but end after
+ * NOTE: does not deal with durations, only start
  * returns NULL when there is no more future occurrence
  * @param {*} parsed the value returned by "parse" function of this module
  * @param {*} from the Date to start from
@@ -92,7 +94,7 @@ export function next(parsed: ParsedCron, from: Date, timezone = 'utc') {
     // iter is just a safety net to prevent infinite recursive calls
     // because I'm not 100% sure this won't happen
     iter = 0;
-    const nextOccurence = findOnce(parsed, new Date((Math.floor(from.getTime() / 60000) + 1) * 60000), timezone.toLowerCase())
+    const nextOccurence = findOnce(parsed, new Date(((from.getTime() - parsed.duration) / 60000) * 60000), timezone.toLowerCase())
     if (
         nextOccurence === null
         || parsed.end === null

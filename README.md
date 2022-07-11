@@ -32,14 +32,19 @@ There are only 4 methods: `parse`, `next`, `prev`, `withinRange`
 ```js
 import awsCronParser from "aws-cron-parser";
 
-// first we need to parse the cron expression, can also include an earliest possible date and a latest possible date
-const cron = awsCronParser.parse("9 * 7,9,11 5 ? 2020,2022,2024-2099", new Date(), new Date(Date.now() + 5 * 86400000));
+const duration = 3600000
 
-// to get the first occurrence from now, only timezones currently supported are local and utc (default)
+// first we need to parse the cron expression, can also include an earliest possible date and a latest possible date
+const cron = awsCronParser.parse(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000));
+
+// to get the first occurrence that ends after now
+// only timezones currently supported are local and utc (default)
 let occurrence = awsCronParser.next(cron, new Date(), 'local');
 
 // to get the next occurrence following the previous one
-occurrence = awsCronParser.next(cron, occurrence, 'UTC');
+occurrence = awsCronParser.next(cron, new Date(occurrence.getTime() + cron.duration + 60000) , 'UTC');
+
+// occurrence = awsCronParser.next(cron, new Date(occurrence.getTime() + duration + 60000) , 'UTC');
 
 // and use prev to get the previous occurrence
 occurrence = awsCronParser.prev(cron, occurrence);

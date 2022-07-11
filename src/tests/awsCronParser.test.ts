@@ -1,4 +1,4 @@
-import AwsCronParser from '..';
+import AwsCronParser, { prev, parse } from '..';
 import { logger } from './logger';
 
 test('should generate next & prev occurence for various crons', () => {
@@ -30,19 +30,16 @@ test('should generate next & prev occurence for various crons', () => {
         ['0 1 2 3 ? *', 'Tue, 02 Mar 2021 01:00:00 GMT', 'Mon, 02 Mar 2020 01:00:00 GMT'],
         ['7 1 2 3 ? *', 'Tue, 02 Mar 2021 01:07:00 GMT', 'Mon, 02 Mar 2020 01:07:00 GMT'],
         ['* * 2 3 ? *', 'Tue, 02 Mar 2021 00:00:00 GMT', 'Mon, 02 Mar 2020 23:59:00 GMT'],
-    ].map(cron=> {
-        cron[0] += ' 3600000'
-        return cron
-    });
+    ];
 
     crons.forEach(([cron, nextShouldBe, prevShouldBe]) => {
-        const parsed = AwsCronParser.parse(cron);
+        const parser = new AwsCronParser(cron);
 
-        occurence = AwsCronParser.next(parsed, base);
+        occurence = parser.next(base);
         logger.debug(cron, { label: occurence?.toUTCString() });
         expect(occurence?.toUTCString()).toBe(nextShouldBe);
 
-        occurence = AwsCronParser.prev(parsed, base);
+        occurence = prev(parse(cron), base); // !!! prev not implemented yet in AwsCronParser
         logger.debug(cron, { label: occurence?.toUTCString() });
         expect(occurence?.toUTCString()).toBe(prevShouldBe);
     });
