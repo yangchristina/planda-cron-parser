@@ -1,15 +1,16 @@
 {
-    "name": "aws-cron-parser",
-    "version": "1.1.12",
-    "description": "A util to parse cron expressions used by AWS services",
+    "name": "event-cron-parser",
+    "version": "1.0",
+    "description": "A util to parse cron expressions with aws cron syntax, with a few additional features including durations, and a start and end for the event, to schedule recurring events.",
     "keywords": [
         "aws",
-        "cloudwatch",
         "cron",
-        "parser"
+        "parser",
+        "event",
+        "recurring event"
     ],
     "license": "MIT",
-    "author": "Vinh Tuong Nguyen",
+    "author": "Christina Yang",
     "repository": {
         "type": "git",
         "url": "https://github.com/beemhq/aws-cron-parser.git"

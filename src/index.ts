@@ -15,7 +15,7 @@ class AwsCronParser {
     timezone = 'local'
 
     constructor(cron: string, start?: Date | number, end?: Date | number, tz?: 'local' | 'utc' | 'UTC') {
-        this.parsedCron = parse(cron);
+        this.parsedCron = parse(cron, start, end);
         this.earliestDate = start ? new Date(start) : new Date(0);
         this.latestDate = end ? new Date(end) : null;
         this.prev = new Date(0)
@@ -28,9 +28,9 @@ class AwsCronParser {
 
     // if from is given, return next after or equal to from date
     // if from not given, give next after prev, prev is initialized as new Date(0)
-    next(from?: Date) {
-        if (from) this.prev = next(this.parsedCron, from) // including from
-        else if (this.prev) this.prev = next(this.parsedCron, new Date(this.prev.getTime() + this.parsedCron.duration + 60000), 'local')
+    next(from?: Date | number) {
+        if (from !== undefined) this.prev = next(this.parsedCron, new Date(from), this.timezone) // including from
+        else if (this.prev) this.prev = next(this.parsedCron, new Date(this.prev.getTime() + this.parsedCron.duration + 60000), this.timezone)
         return this.prev;
     }
 

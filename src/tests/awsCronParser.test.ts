@@ -34,6 +34,7 @@ test('should generate next & prev occurence for various crons', () => {
 
     crons.forEach(([cron, nextShouldBe, prevShouldBe]) => {
         const parser = new AwsCronParser(cron);
+        parser.setTimezone('utc')
 
         occurence = parser.next(base);
         logger.debug(cron, { label: occurence?.toUTCString() });
@@ -42,5 +43,34 @@ test('should generate next & prev occurence for various crons', () => {
         occurence = prev(parse(cron), base); // !!! prev not implemented yet in AwsCronParser
         logger.debug(cron, { label: occurence?.toUTCString() });
         expect(occurence?.toUTCString()).toBe(prevShouldBe);
+    });
+});
+
+test('test parse and next local #1', () => {
+    const crons: { cron: string; should: string[] }[] = [
+        {
+            cron: "0 7 ? * MON,WED,FRI *",
+            should: [
+                new Date(2022, 6, 6, 7).toString(), // wed
+                new Date(2022, 6, 8, 7).toString(), // fri
+                new Date(2022, 6, 11, 7).toString(), // mon
+                new Date(2022, 6, 13, 7).toString(), // wed
+                new Date(2022, 6, 15, 7).toString(), // fri
+                new Date(2022, 6, 18, 7).toString(), // fri
+                'null'
+            ],
+        },
+    ]
+
+    crons.forEach(({ cron, should: theyShouldBe }) => {
+        const parsed = new AwsCronParser(cron, new Date(2022, 6, 6), new Date(2022, 6, 19));
+        // let occurence: Date = parsed.next(); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
+        theyShouldBe.forEach((itShouldBe, i) => {
+            const occurence = parsed.next();
+            logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
+            if (itShouldBe === 'null')
+                expect(occurence).toBeNull();
+            else expect(occurence?.toString()).toBe(itShouldBe);
+        });
     });
 });
