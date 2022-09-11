@@ -1,5 +1,6 @@
-import { parse, ParsedCron } from './lib/parse';
+import { parse, ParsedCron, } from './lib/parse';
 import { next } from './lib/next';
+import { getScheduleDescription } from './lib/desc'
 
 /**
  * cron is assumed to be validated by AWS already
@@ -56,6 +57,10 @@ class AwsCronParser {
 
     isInRange(start: number | Date, end: number | Date) {
         return this.range(start, end).length > 0
+    }
+
+    desc() {
+        return getScheduleDescription(this.parsedCron)
     }
 }
 // { ...parse, ...next, ...prev, ...desc }
