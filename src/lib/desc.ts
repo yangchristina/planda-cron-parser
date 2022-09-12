@@ -93,7 +93,13 @@ export function getScheduleDescription(p: ParsedCron): string {
     if (p.daysOfMonth.length > 0) desc += handleDaysOfMonth(p);
     else if (p.daysOfWeek.length > 0) desc += handleDaysOfWeek(p);
 
-    if (perDay === 1) desc += ` at ${handleOncePerDay(p)}`;
+    const endMinutes = p.duration / 1000 / 60
+
+    const hours = Math.floor(endMinutes / 60)
+    const minutes = endMinutes % 60
+
+    // @ts-expect-error
+    if (perDay === 1) desc += p.duration ? ` from ${handleOncePerDay(p)} - ${handleOncePerDay({...p, minutes: p.minutes.map(x=> x + minutes), hours: p.hours.map(x => x + hours) })}` : ` at ${handleOncePerDay(p)}`;
 
     return desc;
 }
