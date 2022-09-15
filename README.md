@@ -26,7 +26,7 @@ npm install event-cron-parser
 
 ## Usage
 
-There are only 5 methods so far: `parse`, `next`, `range`, `isInRange`    
+There are only 6 methods so far: `parse`, `next`, `range`, `isInRange`, `desc`  
 `prev` will (probably) be added at a later date
 
 ```js
@@ -35,7 +35,7 @@ import AwsCronParser from "aws-cron-parser";
 const duration = 3600000 // in milliseconds
 
 // first we need to parse the cron expression, can also include an earliest possible date and a latest possible date
-const cronParser = new AwsCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000), 'local') // default tz is 'local', can use setTimezone to change, or pass into constructor, only timezones currently supported are local and utc (default)
+const cronParser = new AwsCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000)) // default tz is 'local', can use setTimezone to change, or pass into constructor, only timezones currently supported are local and utc (default)
 
 // to get the first occurrence that ends after or at the same time as now
 let occurrence: Date | null = cronParser.next(new Date());
@@ -53,5 +53,15 @@ const isInRange: boolean = cronParser.isInRange(new Date(), Date.now() + 8640000
 
 // use range to get dates of all events within range, includes everything that ends after start, and starts before end
 const occurences: Date[] = cronParser.range(new Date(), Date.now() + 86400000);
+
+
+const cronParser2 = new AwsCronParser(`0 15 ? * 2,4,6 * 3600000`, new Date(), new Date(Date.now() + 5 * 86400000))
+
+// use desc to get a simple description of the cron
+console.log(cronParser.desc()); // default will give description in UTC
+console.log(cronParser.desc('utc'));
+// output: 'every Monday, Wednesday, and Friday from 3:00 PM - 4:00 PM'
+console.log(cronParser.desc('local')); // gives description in local time
+// output: 'every Monday, Wednesday, and Friday from 8:00 AM - 9:00 AM'
 
 ```

@@ -1,4 +1,4 @@
-import { logger } from '../logger';
+// import { logger } from '../logger';
 import { prev, parse } from '../..';
 
 test('should generate multiple previous occurences', () => {
@@ -25,7 +25,7 @@ test('should generate multiple previous occurences', () => {
         let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = prev(parsed, occurence) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });

@@ -7,12 +7,12 @@ test('test local #1', () => {
         {
             cron: "0 7 ? * MON,WED,FRI *",
             should: [
-                new Date(2022, 6, 6, 7).toString(), // wed
-                new Date(2022, 6, 8, 7).toString(), // fri
-                new Date(2022, 6, 11, 7).toString(), // mon
-                new Date(2022, 6, 13, 7).toString(), // wed
-                new Date(2022, 6, 15, 7).toString(), // fri
-                new Date(2022, 6, 18, 7).toString(), // fri
+                new Date(Date.UTC(2022, 6, 6, 7)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 8, 7)).toString(), // fri
+                new Date(Date.UTC(2022, 6, 11, 7)).toString(), // mon
+                new Date(Date.UTC(2022, 6, 13, 7)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 15, 7)).toString(), // fri
+                new Date(Date.UTC(2022, 6, 18, 7)).toString(), // fri
             ],
         },
     ]
@@ -22,7 +22,7 @@ test('test local #1', () => {
         let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe, i) => {
             logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + 60000)?.toString()}` });
-            occurence = next(parsed, new Date(occurence.getTime() + 60000), 'local') || new Date(0);
+            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
             logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
             logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
             expect(occurence?.toString()).toBe(itShouldBe);
@@ -36,12 +36,12 @@ test('test local duration #1', () => {
         {
             cron: "30 7 ? * MON,WED,FRI * " + duration,
             should: [
-                new Date(2022, 6, 6, 7, 30).toString(), // wed
-                new Date(2022, 6, 8, 7, 30).toString(), // fri
-                new Date(2022, 6, 11, 7, 30).toString(), // mon
-                new Date(2022, 6, 13, 7, 30).toString(), // wed
-                new Date(2022, 6, 15, 7, 30).toString(), // fri
-                new Date(2022, 6, 18, 7, 30).toString(), // fri
+                new Date(Date.UTC(2022, 6, 6, 7, 30)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 8, 7, 30)).toString(), // fri
+                new Date(Date.UTC(2022, 6, 11, 7, 30)).toString(), // mon
+                new Date(Date.UTC(2022, 6, 13, 7, 30)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 15, 7, 30)).toString(), // fri
+                new Date(Date.UTC(2022, 6, 18, 7, 30)).toString(), // fri
             ],
         },
     ]
@@ -51,7 +51,7 @@ test('test local duration #1', () => {
         let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe, i) => {
             logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + duration + 60000)?.toString()}` });
-            occurence = next(parsed, new Date(occurence.getTime() + duration + 60000), 'local') || new Date(0);
+            occurence = next(parsed, new Date(occurence.getTime() + duration + 60000)) || new Date(0);
             logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
             logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
             expect(occurence?.toString()).toBe(itShouldBe);
@@ -65,9 +65,9 @@ test('test local duration #2', () => {
         {
             cron: "30 7 ? * MON,WED,FRI * " + duration,
             should: [
-                new Date(2022, 6, 6, 7, 30).toString(), // wed
-                new Date(2022, 6, 6, 7, 30).toString(), // wed
-                new Date(2022, 6, 6, 7, 30).toString(), // wed
+                new Date(Date.UTC(2022, 6, 6, 7, 30)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 6, 7, 30)).toString(), // wed
+                new Date(Date.UTC(2022, 6, 6, 7, 30)).toString(), // wed
             ],
         },
     ]
@@ -76,7 +76,7 @@ test('test local duration #2', () => {
         const parsed = parse(cron);
         let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + duration / 2), 'local') || new Date(0);
+            occurence = next(parsed, new Date(occurence.getTime() + duration / 2) ) || new Date(0);
             expect(occurence?.toString()).toBe(itShouldBe);
         });
     });
@@ -106,7 +106,7 @@ test('should generate multiple next occurences #1', () => {
         let occurence: Date = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence?.toUTCString()).toBe(itShouldBe);
         });
     });
@@ -136,7 +136,7 @@ test('should generate multiple next occurences #2', () => {
         let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });
@@ -160,7 +160,7 @@ test('should generate multiple next occurences #3', () => {
         let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });
@@ -184,7 +184,7 @@ test('should generate multiple next occurences #4', () => {
         let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });
@@ -208,7 +208,7 @@ test('next-6', () => {
         let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });
@@ -267,7 +267,7 @@ test('next-8', () => {
         let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence.toUTCString()).toBe(itShouldBe);
         });
     });

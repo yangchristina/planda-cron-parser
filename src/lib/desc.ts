@@ -1,5 +1,5 @@
 import * as n2w from 'number-to-words';
-import { ParsedCron } from './parse';
+import { ParsedCron, } from './parse';
 
 const monthNumberToWord = (n: number) => {
     return [
@@ -83,23 +83,66 @@ const handleOncePerDay = (p: ParsedCron) => {
 /**
  * @param {*} p the value returned by "parse" function of this module
  */
-export function getScheduleDescription(p: ParsedCron): string {
+export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): string {
+    const p = {...p0}
     let desc = '';
+
+    // const 
+    if (tz == 'local') {
+        // days of week only work if there is only one value for hour and minute
+        const MIN_PER_DAY = 1440
+        // p needs to by copy, cannot affect old
+        p.daysOfWeek = p.daysOfWeek.map(dow => {
+            dow = (typeof dow === 'string' ? parseInt(dow) : dow)
+            const min = (typeof p.hours[0] === 'string' ? parseInt(p.hours[0]) : p.hours[0]) * 60 + (typeof p.minutes[0] === 'string' ? parseInt(p.minutes[0]) : p.minutes[0])
+            const offsetInMinutes = new Date().getTimezoneOffset()
+            const newMin = min + offsetInMinutes
+            if (newMin < 0) return (dow - 1) || 7
+            if (newMin < MIN_PER_DAY) return dow
+            return dow == 7 ? 1 : dow + 1
+        })
+        p.hours = p.hours.map(h => {
+            h = typeof h === 'string' ? parseInt(h) : h
+            const date1 = new Date()
+            date1.setUTCHours(h)
+            return date1.getHours()
+        })
+        p.minutes.map(m => {
+            m = typeof m === 'string' ? parseInt(m) : m
+            const date2 = new Date()
+            date2.setUTCMinutes(m)
+            return date2.getMinutes()
+        })
+    }
 
     const perDay = p.minutes.length * p.hours.length;
     if (perDay === 2) desc += 'twice a day, ';
     else if (perDay > 2) desc += `${n2w.toWords(perDay)} times a day, `;
 
-    if (p.daysOfMonth.length > 0) desc += handleDaysOfMonth(p);
+    if (p.daysOfMonth.length > 0) desc += handleDaysOfMonth(p); // don't think timezone has large effect so shall just ignore for now
     else if (p.daysOfWeek.length > 0) desc += handleDaysOfWeek(p);
 
-    const endMinutes = p.duration / 1000 / 60
+    const durationInMinutes = p.duration / 1000 / 60
 
-    const hours = Math.floor(endMinutes / 60)
-    const minutes = endMinutes % 60
+    const durationHours = Math.floor(durationInMinutes / 60)
+    const durationMinutes = durationInMinutes % 60
 
     // @ts-expect-error
-    if (perDay === 1) desc += p.duration ? ` from ${handleOncePerDay(p)} - ${handleOncePerDay({...p, minutes: p.minutes.map(x=> x + minutes), hours: p.hours.map(x => x + hours) })}` : ` at ${handleOncePerDay(p)}`;
+    if (perDay === 1) desc += p.duration ? ` from ${handleOncePerDay(p)} - ${handleOncePerDay({ ...p, minutes: p.minutes.map(x => x + durationMinutes), hours: p.hours.map(x => x + durationHours) })}` : ` at ${handleOncePerDay(p)}`;
 
     return desc;
+}
+
+
+export function nextDay(
+    date: Date | number,
+    day: number
+): Date {
+    date = new Date(date)
+    day = day % 7
+    let delta = day - date.getDay()
+    if (delta <= 0) delta += 7
+
+    date.setDate(date.getDate() + delta)
+    return date
 }

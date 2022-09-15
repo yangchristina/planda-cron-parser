@@ -6,7 +6,7 @@ import { next } from './next'
  * @param {*} start start of date interval
  * @param {*} end end of date interval
  */
- export function withinRange(parsed: ParsedCron, start = new Date(0), end: Date | null = null, timezone = 'utc'): boolean {
+ export function withinRange(parsed: ParsedCron, start = new Date(0), end: Date | null = null): boolean {
     const occurence = next(parsed, start)
     if (occurence === null) return false
     if (end === null) return true
