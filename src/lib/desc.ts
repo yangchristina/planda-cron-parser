@@ -80,6 +80,10 @@ const handleOncePerDay = (p: ParsedCron) => {
     return `${h}:${mm} ${am}`;
 };
 
+function ruleAsNumber(x: string | number): number {
+    return (typeof x === 'string' ? parseInt(x) : x)
+}
+
 /**
  * @param {*} p the value returned by "parse" function of this module
  */
@@ -89,17 +93,20 @@ export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | '
 
     // const 
     if (tz == 'local') {
-        // days of week only work if there is only one value for hour and minute
-        const MIN_PER_DAY = 1440
-        // p needs to by copy, cannot affect old
+        // won't work a lot if there are multiple hours and minutes, only follows first hour and first minute
         p.daysOfWeek = p.daysOfWeek.map(dow => {
-            dow = (typeof dow === 'string' ? parseInt(dow) : dow)
-            const min = (typeof p.hours[0] === 'string' ? parseInt(p.hours[0]) : p.hours[0]) * 60 + (typeof p.minutes[0] === 'string' ? parseInt(p.minutes[0]) : p.minutes[0])
-            const offsetInMinutes = new Date().getTimezoneOffset()
-            const newMin = min + offsetInMinutes
-            if (newMin < 0) return (dow - 1) || 7
-            if (newMin < MIN_PER_DAY) return dow
-            return dow == 7 ? 1 : dow + 1
+            dow = ruleAsNumber(dow)
+
+            const date = nextUTCDay(Date.now(), dow - 1)
+            date.setUTCHours(ruleAsNumber(p.hours[0]), ruleAsNumber(p.minutes[0]))
+
+            return date.getDay() + 1
+            // const min = (typeof p.hours[0] === 'string' ? parseInt(p.hours[0]) : p.hours[0]) * 60 + (typeof p.minutes[0] === 'string' ? parseInt(p.minutes[0]) : p.minutes[0])
+            // const offsetInMinutes = new Date().getTimezoneOffset()
+            // const newMin = min + offsetInMinutes
+            // if (newMin < 0) return (dow - 1) || 7
+            // if (newMin < MIN_PER_DAY) return dow
+            // return dow == 7 ? 1 : dow + 1
         })
         p.hours = p.hours.map(h => {
             h = typeof h === 'string' ? parseInt(h) : h
@@ -134,15 +141,15 @@ export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | '
 }
 
 
-export function nextDay(
+export function nextUTCDay(
     date: Date | number,
     day: number
 ): Date {
     date = new Date(date)
     day = day % 7
-    let delta = day - date.getDay()
+    let delta = day - date.getUTCDay()
     if (delta <= 0) delta += 7
 
-    date.setDate(date.getDate() + delta)
+    date.setUTCDate(date.getUTCDate() + delta)
     return date
 }

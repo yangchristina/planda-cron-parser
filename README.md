@@ -61,7 +61,7 @@ const cronParser2 = new AwsCronParser(`0 15 ? * 2,4,6 * 3600000`, new Date(), ne
 console.log(cronParser.desc()); // default will give description in UTC
 console.log(cronParser.desc('utc'));
 // output: 'every Monday, Wednesday, and Friday from 3:00 PM - 4:00 PM'
-console.log(cronParser.desc('local')); // gives description in local time
+console.log(cronParser.desc('local')); // gives description in local time, day of week depends on first hour and minute given if multiple values are given for hours and minutes in cron
 // output: 'every Monday, Wednesday, and Friday from 8:00 AM - 9:00 AM'
 
 ```

@@ -5,6 +5,7 @@ test('should generate readable schedule description', () => {
     const cronsUTC = [
         ['0 8 * * ? * 3600000', 'every day from 8:00 AM - 9:00 AM'],
         ['0 15 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 3:00 PM - 4:00 PM'],
+        ['0 18 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 6:00 PM - 7:00 PM'],
         ['15,45 6 * * ? *', 'twice a day, every day'],
         ['0 7,8,9 * * ? *', 'three times a day, every day'],
         ['*/10 */6 * * ? * 3600000', 'twenty-four times a day, every day'],
@@ -28,6 +29,7 @@ test('should generate readable schedule description', () => {
     const cronsLocal = [
         ['0 15 * * ? * 3600000', 'every day from 8:00 AM - 9:00 AM'],
         ['0 15 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 8:00 AM - 9:00 AM'],
+        ['0 18 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 11:00 AM - 12:00 PM']
     ]
 
     cronsUTC.forEach(([cron, itShouldBe]) => {
