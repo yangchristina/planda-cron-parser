@@ -109,6 +109,8 @@ class EventCronParser {
         cronArray[4] = updated.join(',')
         this.#cron = cronArray.join(' ')
         this.parsedCron.daysOfWeek = updated
+
+        return updated;
     }
 
     getCron() {
