@@ -1,4 +1,5 @@
-import AwsCronParser, { prev, parse } from '..';
+import { prev, parse } from '../lib';
+import EventCronParser from '..';
 import { logger } from './logger';
 
 test('should generate next & prev occurence for various crons', () => {
@@ -33,7 +34,7 @@ test('should generate next & prev occurence for various crons', () => {
     ];
 
     crons.forEach(([cron, nextShouldBe, prevShouldBe]) => {
-        const parser = new AwsCronParser(cron);
+        const parser = new EventCronParser(cron);
 
         occurence = parser.next(base);
         // logger.debug(cron, { label: occurence?.toUTCString() });
@@ -62,7 +63,7 @@ test('test parse and next local #1', () => {
     ]
 
     crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = new AwsCronParser(cron, new Date(2022, 6, 6), new Date(2022, 6, 19));
+        const parsed = new EventCronParser(cron, new Date(2022, 6, 6), new Date(2022, 6, 19));
         // let occurence: Date = parsed.next(); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe, i) => {
             const occurence = parsed.next();

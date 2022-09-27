@@ -1,5 +1,5 @@
 import { logger } from '../logger';
-import { parse } from '../..';
+import { parse } from '../../lib/parse'
 
 const arr = (s: number, e: number, step = 1) => {
     const rs = [];

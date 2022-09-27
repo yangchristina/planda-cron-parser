@@ -1,5 +1,5 @@
 // import AwsCronParser from '../..';
-import { next, parse } from '../..';
+import { next, parse } from '../../lib';
 import { logger } from '../logger';
 
 test('test local #1', () => {

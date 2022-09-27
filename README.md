@@ -26,7 +26,7 @@ npm install event-cron-parser
 
 ## Usage
 
-There are only 6 methods so far: `parse`, `next`, `range`, `isInRange`, `desc`  
+Methods so far: `parse`, `next`, `range`, `isInRange`, `desc`, `getLocalDays`, `setUTCHours` , `setDaysOfWeek`, `getCron`,
 `prev` will (probably) be added at a later date
 
 ```js

@@ -1,4 +1,5 @@
 import * as n2w from 'number-to-words';
+import { nextUTCDay } from './local';
 import { ParsedCron, } from './parse';
 
 const monthNumberToWord = (n: number) => {
@@ -141,15 +142,3 @@ export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | '
 }
 
 
-export function nextUTCDay(
-    date: Date | number,
-    day: number
-): Date {
-    date = new Date(date)
-    day = day % 7
-    let delta = day - date.getUTCDay()
-    if (delta <= 0) delta += 7
-
-    date.setUTCDate(date.getUTCDate() + delta)
-    return date
-}

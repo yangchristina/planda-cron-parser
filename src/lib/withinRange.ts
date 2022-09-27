@@ -1,4 +1,4 @@
-import { ParsedCron } from '..'
+import { ParsedCron } from './'
 import { next } from './next'
 /**
  * returns true if parsed cron can occur between between start and end

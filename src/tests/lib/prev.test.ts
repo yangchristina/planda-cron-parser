@@ -1,5 +1,5 @@
 // import { logger } from '../logger';
-import { prev, parse } from '../..';
+import { prev, parse } from '../../lib';
 
 test('should generate multiple previous occurences', () => {
     const crons: { cron: string; should: string[] }[] = [

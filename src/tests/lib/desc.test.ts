@@ -1,5 +1,5 @@
 import { logger } from '../logger';
-import { parse, getScheduleDescription } from '../..';
+import { parse, getScheduleDescription } from '../../lib'
 
 test('should generate readable schedule description', () => {
     const cronsUTC = [
