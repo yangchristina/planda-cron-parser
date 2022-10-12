@@ -26,9 +26,10 @@ npm install event-cron-parser
 
 ## Usage
 
-Methods so far: `parse`, `next`, `range`, `isInRange`, `desc`, `getLocalDays`, `setUTCHours` , `setDaysOfWeek`, `getCron`,
+Methods so far: `parse`, `next`, `range`, `isInRange`, `desc`, `getLocalDays`, `setUTCHours` , `setDaysOfWeek`, `getCron`, `validate`
 `prev` will (probably) be added at a later date
 
+`validate` throws error when called if the cron is invalid
 ```js
 import AwsCronParser from "aws-cron-parser";
 
