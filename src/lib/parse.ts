@@ -114,10 +114,25 @@ const dayWeekReplaces = [
     ['SAT', '7'],
 ];
 
+const VALID_CHARS = new Set(['L', 'W', '#'])
+function validateParsedRule(rule: ParsedRule) {
+    rule.forEach(val=>{
+        if (typeof val === 'number') {
+            if (Number.isNaN(val))
+                throw new Error('invalid cron (NaN)')
+        } else if (typeof val === 'string') {
+            if (!VALID_CHARS.has(val))
+                throw new Error('invalid cron: ' + val + ' not accepted')
+        } else {
+            throw new Error(`invalid cron: ${typeof val} not accepted`)
+        }
+    })
+}
+
 export function parse(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
     const rules = cron.split(' ');
 
-    return {
+    const parsed = {
         minutes: parseOneRule(rules[0], 0, 59),
         hours: parseOneRule(rules[1], 0, 23),
         daysOfMonth: parseOneRule(rules[2], 1, 31),
@@ -128,4 +143,15 @@ export function parse(cron: string, start?: Date | number, end?: Date | number):
         start: start ? new Date(start) : new Date(0),
         end: end ? new Date(end) : null
     };
+
+    validateParsedRule(parsed.minutes)
+    validateParsedRule(parsed.hours)
+    validateParsedRule(parsed.daysOfMonth)
+    validateParsedRule(parsed.months)
+    validateParsedRule(parsed.daysOfWeek)
+    validateParsedRule(parsed.years)
+
+    if (isNaN(parsed.duration)) throw new Error('invalid duration')
+
+    return parsed;
 }

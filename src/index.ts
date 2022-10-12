@@ -22,7 +22,7 @@ class EventCronParser {
         this.parsedCron = parse(cron, start, end);
         this.earliestDate = start ? new Date(start) : new Date(0);
         this.latestDate = end ? new Date(end) : null;
-        this.#prevDate = new Date(0)
+        this.#prevDate = new Date()
     }
 
     // if from is given, return next after or equal to from date
