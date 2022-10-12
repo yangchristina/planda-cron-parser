@@ -81,6 +81,7 @@ const parseOneRule = (rule: string, min: number, max: number): ParsedRule => {
     return allows;
 };
 
+// ex. s = "1,2"
 const replace = (s: string, rules: string[][]) => {
     let rs = s.toUpperCase();
     rules.forEach(([from, to]) => {
@@ -115,7 +116,7 @@ const dayWeekReplaces = [
 ];
 
 const VALID_CHARS = new Set(['L', 'W', '#'])
-function validateParsedRule(rule: ParsedRule) {
+export function validateParsedRule(rule: ParsedRule) {
     rule.forEach(val=>{
         if (typeof val === 'number') {
             if (Number.isNaN(val))
@@ -132,7 +133,7 @@ function validateParsedRule(rule: ParsedRule) {
 export function parse(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
     const rules = cron.split(' ');
 
-    const parsed = {
+    return {
         minutes: parseOneRule(rules[0], 0, 59),
         hours: parseOneRule(rules[1], 0, 23),
         daysOfMonth: parseOneRule(rules[2], 1, 31),
@@ -143,15 +144,4 @@ export function parse(cron: string, start?: Date | number, end?: Date | number):
         start: start ? new Date(start) : new Date(0),
         end: end ? new Date(end) : null
     };
-
-    validateParsedRule(parsed.minutes)
-    validateParsedRule(parsed.hours)
-    validateParsedRule(parsed.daysOfMonth)
-    validateParsedRule(parsed.months)
-    validateParsedRule(parsed.daysOfWeek)
-    validateParsedRule(parsed.years)
-
-    if (isNaN(parsed.duration)) throw new Error('invalid duration')
-
-    return parsed;
 }

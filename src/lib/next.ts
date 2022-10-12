@@ -92,7 +92,7 @@ export function next(parsed: ParsedCron, from: Date,) {
     if (
         nextOccurence === null
         || parsed.end === null
-        || nextOccurence.getTime() + parsed.duration < parsed.end.getTime()
+        || nextOccurence.getTime() < parsed.end.getTime()
     ) return nextOccurence
     return null
     // new Date((Math.floor(from.getTime() / 60000) + 1) * 60000)

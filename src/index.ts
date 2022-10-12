@@ -1,4 +1,4 @@
-import { parse, ParsedCron, } from './lib/parse';
+import { parse, ParsedCron, validateParsedRule, } from './lib/parse';
 import { next } from './lib/next';
 import { getScheduleDescription } from './lib/desc'
 import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
@@ -22,7 +22,7 @@ class EventCronParser {
         this.parsedCron = parse(cron, start, end);
         this.earliestDate = start ? new Date(start) : new Date(0);
         this.latestDate = end ? new Date(end) : null;
-        this.#prevDate = new Date()
+        this.#prevDate = new Date(0) // first occurrence will still be after start, cuz start put in parse
     }
 
     // if from is given, return next after or equal to from date
@@ -115,6 +115,17 @@ class EventCronParser {
 
     getCron() {
         return this.#cron
+    }
+
+    validate() {
+        validateParsedRule(this.parsedCron.minutes)
+        validateParsedRule(this.parsedCron.hours)
+        validateParsedRule(this.parsedCron.daysOfMonth)
+        validateParsedRule(this.parsedCron.months)
+        validateParsedRule(this.parsedCron.daysOfWeek)
+        validateParsedRule(this.parsedCron.years)
+     
+        if (isNaN(this.parsedCron.duration)) throw new Error('invalid duration')
     }
 }
 

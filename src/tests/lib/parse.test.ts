@@ -13,7 +13,7 @@ test('should parse regular AWS cron expressions #1', () => {
     let p;
 
     p = parse('6 4/3 8,18-20,26-28 * ? 2020-2030');
-    logger.debug(JSON.stringify(p), { label: 'cron 1' });
+    logger.debug('6 4/3 8,18-20,26-28 * ? 2020-2030', { label: 'cron 1' });
     expect(p.minutes).toEqual([6]);
     expect(p.hours).toEqual([4, 7, 10, 13, 16, 19, 22]);
     expect(p.daysOfMonth).toEqual([8, 18, 19, 20, 26, 27, 28]);
@@ -102,7 +102,7 @@ test('should parse AWS cron expressions w/ duration #2', () => {
 test('should parse AWS cron expression w/ start #3', () => {
     const date = Date.now()
     let p = parse('*/5 10 ? * MON-FRI *', date);
-    logger.debug(JSON.stringify(p), { label: 'cron 1' });
+    logger.debug('*/5 10 ? * MON-FRI *', { label: 'cron 1' });
     expect(p.minutes).toEqual([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
     expect(p.hours).toEqual([10]);
     expect(p.daysOfMonth).toEqual([]);
@@ -114,7 +114,7 @@ test('should parse AWS cron expression w/ start #3', () => {
     expect(p.end).toBeNull()
 
     p = parse('30 9 L-2 * ? *', new Date(date));
-    logger.debug(JSON.stringify(p), { label: 'cron 1' });
+    logger.debug('30 9 L-2 * ? *', { label: 'cron 1' });
     expect(p.minutes).toEqual([30]);
     expect(p.hours).toEqual([9]);
     expect(p.daysOfMonth).toEqual(['L', 2]);
@@ -129,7 +129,7 @@ test('should parse AWS cron expression w/ start #3', () => {
 test('should parse AWS cron expression w/ end #4', () => {
     const date = Date.now() + 3600000
     let p = parse('0 */3 */1 * ? *', undefined, date);
-    logger.debug(JSON.stringify(p), { label: 'cron 1' });
+    logger.debug('0 */3 */1 * ? *', { label: 'cron 1' });
     expect(p.minutes).toEqual([0]);
     expect(p.hours).toEqual(arr(0, 21, 3));
     expect(p.daysOfMonth).toEqual(arr(1, 31));

@@ -27,7 +27,8 @@
         "tsc": "tsc",
         "test": "jest built/tests/**",
         "prepublishOnly": "tsc",
-        "benchmark": "node built/benchmark.js"
+        "benchmark": "node built/benchmark.js",
+        "test1": "jest built/tests/** -t 'test parse and next local #1'"
     },
     "dependencies": {
         "number-to-words": "^1.2.4"
