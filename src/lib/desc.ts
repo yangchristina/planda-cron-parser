@@ -150,7 +150,6 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
     return desc;
 }
 
-
 export default function formatDuration( duration: number ): string {
     const time = {
         week: Math.floor(duration / 86400 / 7),

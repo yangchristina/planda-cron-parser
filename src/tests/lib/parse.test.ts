@@ -224,7 +224,6 @@ function testRates(testCases: any) {
     })
 }
 
-
 test('should parse regular AWS cron expressions #1', () => {
     testCrons(TEST_CRONS_NO_DUR)
 });

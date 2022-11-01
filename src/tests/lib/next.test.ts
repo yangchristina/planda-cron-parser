@@ -2,12 +2,12 @@
 import { logger } from '../logger';
 import EventCronParser from '../../'
 
-function testMultipleNext(crons: any[], start: Date) {
+function testMultipleNext(crons: any[], start: Date, offsetFromPrev = 60000) {
     crons.forEach(({ cron, should: theyShouldBe }) => {
         const event = new EventCronParser(cron)
         let occurence: Date = start;
         theyShouldBe.forEach((itShouldBe: any, i: number) => {
-            occurence = event.next(new Date(occurence.getTime() + 60000)) || new Date(0);
+            occurence = event.next(new Date(occurence.getTime() + offsetFromPrev)) || new Date(0);
             // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence?.toUTCString()).toBe(itShouldBe);
         });
@@ -44,7 +44,6 @@ test('test local #1', () => {
     ]
 
     testCases(crons, 'local')
-
 });
 
 test('test local duration #1', () => {
@@ -217,3 +216,21 @@ test('next-8', () => {
 
     testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57)))
 });
+
+test('next-rate-1', ()=> {
+    const crons: { cron: string; should: string[] }[] = [
+        {
+            cron: 'rate(2 days)',
+            should: [
+                'Sun, 10 May 2020 09:30:00 GMT',
+                'Tue, 12 May 2020 09:30:00 GMT',
+                'Thu, 14 May 2020 09:30:00 GMT',
+                'Sat, 16 May 2020 09:30:00 GMT',
+                'Mon, 18 May 2020 09:30:00 GMT',
+                'Wed, 20 May 2020 09:30:00 GMT',
+            ],
+        },
+    ];
+
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)), 0)
+})

@@ -47,12 +47,12 @@ class EventCronParser {
     // if from not given, give next after prev, prev is initialized as new Date(0)
     next(from?: Date | number) {
         if (this.#isRateExpression) {
-            let nextTime: null | number = null
-            const rate = this.parsedCron as ParsedRate
-            if (from !== undefined) nextTime = new Date(from).getTime() + rate.rate
-            else if (this.#prevDate) nextTime = this.#prevDate.getTime() + rate.rate
-            else nextTime = this.#prevDate ? (this.#prevDate as Date).getTime() : null // not sure what this is for
-            if (!nextTime || this.latestDate && nextTime + rate.duration > this.latestDate?.getTime()) return null
+            const goFrom = from || this.#prevDate || null
+            if (goFrom === null) return null
+            const nextTime = new Date(goFrom).getTime() + (<ParsedRate>this.parsedCron).rate * 1000
+
+            if (this.parsedCron.end && (nextTime + this.parsedCron.duration) > this.parsedCron.end.getTime()) return null
+
             return new Date(nextTime)
         }
         const cron = this.parsedCron as ParsedCron
