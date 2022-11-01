@@ -41,7 +41,7 @@ test('should generate readable schedule description', () => {
 
     cronsLocal.forEach(([cron, itShouldBe]) => {
         const parsed = parse(cron);
-        const desc = getScheduleDescription(parsed, 'local');
+        const desc = getScheduleDescription(parsed, false, undefined, 'local');
         logger.debug(desc, { label: cron });
         expect(desc).toBe(itShouldBe);
     });

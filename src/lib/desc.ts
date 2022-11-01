@@ -1,6 +1,6 @@
 import * as n2w from 'number-to-words';
 import { nextUTCDay } from './local';
-import { ParsedCron, } from './parse';
+import { ParsedCron, ParsedRate, } from './parse';
 
 const monthNumberToWord = (n: number) => {
     return [
@@ -85,11 +85,20 @@ function ruleAsNumber(x: string | number): number {
     return (typeof x === 'string' ? parseInt(x) : x)
 }
 
+export function getRateDesc(p0: ParsedRate, start: Date) {
+    return "Every " + formatDuration(p0.duration) + ' starting from ' + start
+}
+
+export function getScheduleDescription(p0: ParsedCron | ParsedRate, isRateExpression = false, start = new Date(), tz = 'utc' as 'local' | 'utc'): string {
+    if (isRateExpression) return getRateDesc(<ParsedRate>p0, start)
+    return getCronDesc(<ParsedCron>p0, tz)
+}
+
 /**
  * @param {*} p the value returned by "parse" function of this module
  */
-export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): string {
-    const p = {...p0}
+export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): string {
+    const p = { ...p0 }
     let desc = '';
 
     // const 
@@ -142,3 +151,16 @@ export function getScheduleDescription(p0: ParsedCron, tz = 'utc' as 'local' | '
 }
 
 
+export default function formatDuration( duration: number ): string {
+    const time = {
+        week: Math.floor(duration / 86400 / 7),
+        day: Math.floor(duration / 86400) % 7,
+        hour: Math.floor(duration / 3600) % 24,
+        minute: Math.floor(duration / 60) % 60,
+        second: Math.floor(duration / 1) % 60,
+    };
+    return Object.entries(time)
+    .filter(val => val[1] !== 0)
+    .map(([key, val]) => `${val} ${key}${val !== 1 ? 's' : ''}`)
+    .join(', ');
+}

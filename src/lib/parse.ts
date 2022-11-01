@@ -7,9 +7,15 @@ export interface ParsedCron {
     months: ParsedRule;
     daysOfWeek: ParsedRule;
     years: ParsedRule;
-    duration: number,
+    duration: number, // in ms
     start: Date, // this should affect years
     end: Date | null,
+}
+export interface ParsedRate {
+    rate: number, // in seconds
+    duration: number, // in seconds
+    value: number,
+    unit: string,
 }
 
 const parseIntMinMax = (str: string, min: number, max: number): number => {
@@ -130,7 +136,36 @@ export function validateParsedRule(rule: ParsedRule) {
     })
 }
 
-export function parse(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
+export function parse(cron: string, start?: Date | number, end?: Date | number, isRateExpression = false): ParsedCron | ParsedRate {
+    if (isRateExpression) return parseRateExpression(cron)
+    return parseCron(cron, start, end)
+}
+
+// in seconds
+const rateUnits = {
+    'minute': 60,
+    'minutes': 60, 
+    'hour': 360, 
+    'hours': 360, 
+    'day': 360*24, 
+    'days': 360*24
+}
+
+export function parseRateExpression(expression: string,): ParsedRate {
+    const exp = expression.split(',')
+    const rate = exp[0].trim()
+    if (rate.length !== 2) throw new Error('invalid rate expression')
+    const val = parseInt(rate[0])
+    if (Number.isNaN(val)) throw new Error('invalid rate expression value')
+    const unit = rate[1];
+    if (!rateUnits[unit]) throw new Error('invalid rate expression unit')
+
+    // prob better to just store cron as milliseconds or seconds instead
+
+    return {rate: rateUnits[unit] * val, duration: parseInt(exp[1].trim()) || 0, value: val, unit}
+}
+
+export function parseCron(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
     const rules = cron.split(' ');
 
     return {
