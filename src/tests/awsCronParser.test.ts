@@ -1,4 +1,4 @@
-import { prev, parse } from '../lib';
+import { prev, ParsedCron } from '../lib';
 import EventCronParser from '..';
 import { logger } from './logger';
 
@@ -40,7 +40,7 @@ test('should generate next & prev occurence for various crons', () => {
         // logger.debug(cron, { label: occurence?.toUTCString() });
         expect(occurence?.toUTCString()).toBe(nextShouldBe);
 
-        occurence = prev(parse(cron), base); // !!! prev not implemented yet in AwsCronParser
+        occurence = prev(parser.parsedCron as ParsedCron, base); // !!! prev not implemented yet in AwsCronParser
         // logger.debug(cron, { label: occurence?.toUTCString() });
         expect(occurence?.toUTCString()).toBe(prevShouldBe);
     });

@@ -1,7 +1,8 @@
 import { logger } from '../logger';
-import { parse, 
+import { 
     convertLocalDaysOfWeekToUTC, 
-    getLocalDays } from '../../lib';
+    getLocalDays, 
+    parseCron} from '../../lib';
 
 test('test getLocalDays', () => {
     // const cronsUTC = [
@@ -18,7 +19,7 @@ test('test getLocalDays', () => {
     ]
 
     cronsLocal.forEach(([cron, itShouldBe]) => {
-        const parsed = parse(cron as string);
+        const parsed = parseCron(cron as string);
         // const daysOfWeekUTC = convertLocalDaysOfWeekToUTC()
         const daysOfWeekLocal = getLocalDays(parsed)
         logger.debug(daysOfWeekLocal, { label: cron });
@@ -36,7 +37,7 @@ test('test convertLocalDaysOfWeekToUTC', () => {
     ]
 
     cronsLocal.forEach(([daysOfWeek, cron, itShouldBe]) => {
-        const parsed = parse(cron as string);
+        const parsed = parseCron(cron as string);
         // const daysOfWeekUTC = convertLocalDaysOfWeekToUTC()
         const daysOfWeekUTC = convertLocalDaysOfWeekToUTC(daysOfWeek as number[], parsed)
         logger.debug(daysOfWeekUTC, { label: cron });

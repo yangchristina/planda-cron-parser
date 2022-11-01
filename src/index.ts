@@ -33,11 +33,10 @@ class EventCronParser {
     constructor(cron: string, start?: Date | number, end?: Date | number, duration?: number) {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
-            this.#cron = cron.substring(5, cron.length - 1)
         } else {
             this.#isRateExpression = false;
-            this.#cron = cron;
         }
+        this.#cron = cron;
         this.#prevDate = new Date(0) // first occurrence will still be after start, cuz start put in parse
         this.latestDate = end ? new Date(end) : null;
         this.earliestDate = start ? new Date(start) : new Date(0);
@@ -88,7 +87,7 @@ class EventCronParser {
     }
 
     desc(timezone = 'local' as 'local' | 'utc') {
-        return getScheduleDescription(this.parsedCron, this.#isRateExpression, this.earliestDate, timezone)
+        return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone)
     }
 
     // returns days of week in local time

@@ -85,12 +85,12 @@ function ruleAsNumber(x: string | number): number {
     return (typeof x === 'string' ? parseInt(x) : x)
 }
 
-export function getRateDesc(p0: ParsedRate, start: Date) {
-    return "Every " + formatDuration(p0.duration) + ' starting from ' + start
+export function getRateDesc(p0: ParsedRate) {
+    return "Every " + formatDuration(p0.duration) + ' starting from ' + new Date(p0.start).toDateString()
 }
 
-export function getScheduleDescription(p0: ParsedCron | ParsedRate, isRateExpression = false, start = new Date(), tz = 'utc' as 'local' | 'utc'): string {
-    if (isRateExpression) return getRateDesc(<ParsedRate>p0, start)
+export function getScheduleDescription(p0: ParsedCron | ParsedRate, isRateExpression = false, tz = 'utc' as 'local' | 'utc'): string {
+    if (isRateExpression) return getRateDesc(<ParsedRate>p0)
     return getCronDesc(<ParsedCron>p0, tz)
 }
 

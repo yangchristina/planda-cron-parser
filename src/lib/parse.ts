@@ -11,11 +11,14 @@ export interface ParsedCron {
     start: Date, // this should affect years
     end: Date | null,
 }
+
 export interface ParsedRate {
     rate: number, // in seconds
     duration: number, // in seconds
     value: number,
     unit: string,
+    start: Date,
+    end: Date | null,
 }
 
 const parseIntMinMax = (str: string, min: number, max: number): number => {
@@ -137,7 +140,7 @@ export function validateParsedRule(rule: ParsedRule) {
 }
 
 export function parse(cron: string, start?: Date | number, end?: Date | number, isRateExpression = false): ParsedCron | ParsedRate {
-    if (isRateExpression) return parseRateExpression(cron)
+    if (isRateExpression) return parseRateExpression(cron, start, end)
     return parseCron(cron, start, end)
 }
 
@@ -145,24 +148,32 @@ export function parse(cron: string, start?: Date | number, end?: Date | number, 
 const rateUnits = {
     'minute': 60,
     'minutes': 60, 
-    'hour': 360, 
-    'hours': 360, 
-    'day': 360*24, 
-    'days': 360*24
+    'hour': 3600, 
+    'hours': 3600, 
+    'day': 3600*24, 
+    'days': 3600*24
 }
 
-export function parseRateExpression(expression: string,): ParsedRate {
-    const exp = expression.split(',')
-    const rate = exp[0].trim()
+// takes in ex. rate(1 hour, 360000) OR rate(360 minutes)
+export function parseRateExpression(expression: string, start?: Date | number, end?: Date | number): ParsedRate {
+    const exp = expression.substring(5, expression.length - 1).split(',')
+    // const exp = expression.split(',')
+    const rate = exp[0].trim().split(' ')
+
     if (rate.length !== 2) throw new Error('invalid rate expression')
-    const val = parseInt(rate[0])
+    const val = parseInt(rate[0].trim())
     if (Number.isNaN(val)) throw new Error('invalid rate expression value')
     const unit = rate[1];
     if (!rateUnits[unit]) throw new Error('invalid rate expression unit')
 
     // prob better to just store cron as milliseconds or seconds instead
 
-    return {rate: rateUnits[unit] * val, duration: parseInt(exp[1].trim()) || 0, value: val, unit}
+    return {
+        rate: rateUnits[unit] * val, 
+        duration: exp.length > 1 ? parseInt(exp[1].trim()) : 0, 
+        value: val, unit, start: start ? new Date(start) : new Date(0) , 
+        end: end ? new Date(end) : null
+    }
 }
 
 export function parseCron(cron: string, start?: Date | number, end?: Date | number): ParsedCron {

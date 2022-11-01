@@ -1,5 +1,5 @@
 // import { logger } from '../logger';
-import { prev, parse } from '../../lib';
+import { prev, parseCron } from '../../lib';
 
 test('should generate multiple previous occurences', () => {
     const crons: { cron: string; should: string[] }[] = [
@@ -21,7 +21,7 @@ test('should generate multiple previous occurences', () => {
     ]
 
     crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
+        const parsed = parseCron(cron);
         let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
         theyShouldBe.forEach((itShouldBe, i) => {
             occurence = prev(parsed, occurence) || new Date(0);

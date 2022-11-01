@@ -1,6 +1,32 @@
 // import AwsCronParser from '../..';
-import { next, parse } from '../../lib';
 import { logger } from '../logger';
+import EventCronParser from '../../'
+
+function testMultipleNext(crons: any[], start: Date) {
+    crons.forEach(({ cron, should: theyShouldBe }) => {
+        const event = new EventCronParser(cron)
+        let occurence: Date = start;
+        theyShouldBe.forEach((itShouldBe: any, i: number) => {
+            occurence = event.next(new Date(occurence.getTime() + 60000)) || new Date(0);
+            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
+            expect(occurence?.toUTCString()).toBe(itShouldBe);
+        });
+    });
+}
+
+function testCases(crons: any[], tz: 'utc' | 'local' = 'utc', duration = 0) {
+    crons.forEach(({ cron, should: theyShouldBe }) => {
+        const event = new EventCronParser(cron)
+        let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
+        theyShouldBe.forEach((itShouldBe: any, i: number) => {
+            logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + duration + 60000)?.toString()}` });
+            occurence = event.next(new Date(occurence.getTime() + duration + 60000)) || new Date(0);
+            logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
+            logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
+            expect(tz === 'utc' ? occurence.toUTCString() : occurence?.toString()).toBe(itShouldBe);
+        });
+    });
+}
 
 test('test local #1', () => {
     const crons: { cron: string; should: string[] }[] = [
@@ -17,17 +43,8 @@ test('test local #1', () => {
         },
     ]
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
-        theyShouldBe.forEach((itShouldBe, i) => {
-            logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + 60000)?.toString()}` });
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
-            logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
-            expect(occurence?.toString()).toBe(itShouldBe);
-        });
-    });
+    testCases(crons, 'local')
+
 });
 
 test('test local duration #1', () => {
@@ -46,17 +63,8 @@ test('test local duration #1', () => {
         },
     ]
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
-        theyShouldBe.forEach((itShouldBe, i) => {
-            logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + duration + 60000)?.toString()}` });
-            occurence = next(parsed, new Date(occurence.getTime() + duration + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
-            logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
-            expect(occurence?.toString()).toBe(itShouldBe);
-        });
-    });
+    testCases(crons, 'local', duration)
+
 });
 
 test('test local duration #2', () => {
@@ -72,14 +80,7 @@ test('test local duration #2', () => {
         },
     ]
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence: Date = new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + duration / 2) ) || new Date(0);
-            expect(occurence?.toString()).toBe(itShouldBe);
-        });
-    });
+    testCases(crons, 'local', duration / 2 - 60000)
 })
 
 test('should generate multiple next occurences #1', () => {
@@ -101,15 +102,7 @@ test('should generate multiple next occurences #1', () => {
         },
     ]
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence: Date = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence?.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57)))
 });
 
 test('should generate multiple next occurences #2', () => {
@@ -131,15 +124,7 @@ test('should generate multiple next occurences #2', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57)))
 });
 
 test('should generate multiple next occurences #3', () => {
@@ -155,15 +140,7 @@ test('should generate multiple next occurences #3', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37)))
 });
 
 test('should generate multiple next occurences #4', () => {
@@ -179,15 +156,7 @@ test('should generate multiple next occurences #4', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37)))
 });
 
 test('next-6', () => {
@@ -203,15 +172,7 @@ test('next-6', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 12 - 1, 7, 15, 57, 37)))
 });
 
 test('next-7', () => {
@@ -235,15 +196,7 @@ test('next-7', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57)))
 });
 
 test('next-8', () => {
@@ -262,13 +215,5 @@ test('next-8', () => {
         },
     ];
 
-    crons.forEach(({ cron, should: theyShouldBe }) => {
-        const parsed = parse(cron);
-        let occurence = new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57));
-        theyShouldBe.forEach((itShouldBe, i) => {
-            occurence = next(parsed, new Date(occurence.getTime() + 60000)) || new Date(0);
-            // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
-            expect(occurence.toUTCString()).toBe(itShouldBe);
-        });
-    });
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 9, 22, 30, 57)))
 });

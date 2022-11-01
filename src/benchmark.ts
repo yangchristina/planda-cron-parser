@@ -1,15 +1,14 @@
 import Benchmark from 'benchmark';
-import { parse } from '@/lib/parse'
-import { next } from '@/lib/next'
-import { prev } from '@/lib/prev'
+import EventCronParser from '.';
 
 new Benchmark.Suite()
     .add('aws-cron-parser-next', function () {
-        next(parse('1 2 3 4 ? *'), new Date());
+        new EventCronParser('1 2 3 4 ? *').next(new Date())
     })
-    .add('aws-cron-parser-prev', function () {
-        prev(parse('1 2 3 4 ? *'), new Date());
-    })
+    // .add('aws-cron-parser-prev', function () { // TODO
+    //     prev(parse('1 2 3 4 ? *'), new Date());
+    //     new EventCronParser('1 2 3 4 ? *').next(new Date())
+    // })
     .on('cycle', function (event: { target: any }) {
         console.log(String(event.target));
     })
