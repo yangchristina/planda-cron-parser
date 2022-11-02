@@ -83,6 +83,7 @@ class EventCronParser {
         return first && first.getTime() < end
     }
 
+    // TODO: test desc for rates + get rid of seconds in dateString
     desc(timezone = 'local' as 'local' | 'utc') {
         return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone)
     }

@@ -74,8 +74,8 @@ const handleDaysOfWeek = (p: ParsedCron) => {
 
 const handleOncePerDay = (p: ParsedCron) => {
     const { hours, minutes } = p;
-    const h = +hours[0] % 12 || 12;
-    const m = +minutes[0];
+    const h = Math.round(+hours[0] % 12 || 12);
+    const m = Math.round(+minutes[0]);
     const mm = m < 10 ? `0${m}` : `${m}`;
     const am = +hours[0] < 12 ? 'AM' : 'PM';
     return `${h}:${mm} ${am}`;
