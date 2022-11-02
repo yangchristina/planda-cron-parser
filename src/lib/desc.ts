@@ -85,12 +85,32 @@ function ruleAsNumber(x: string | number): number {
     return (typeof x === 'string' ? parseInt(x) : x)
 }
 
-export function getRateDesc(p0: ParsedRate) {
-    return "Every " + formatDuration(p0.duration) + ' starting from ' + new Date(p0.start).toDateString()
+export function getRateDesc(p0: ParsedRate, tz: 'utc' | 'local') {
+    const timeOptions = {
+        hour: 'numeric' as const,
+        minute: '2-digit' as const,
+        ...(tz === 'utc' && { timeZone: 'UTC' }),
+    }
+    const options = {
+        ...timeOptions,
+        weekday: 'long' as const,
+        // year: 'numeric' as const,
+        month: 'long' as const,
+        day: 'numeric' as const,
+    }
+    // const dateOptions = {
+    //     ...(tz === 'utc' && { timeZone: 'UTC' }),
+    //     weekday: 'long' as const,
+    //     year: 'numeric' as const,
+    //     month: 'long' as const,
+    //     day: 'numeric' as const,
+    // }
+    const starting = new Date(p0.start).toLocaleTimeString(undefined, options)
+    return "Every " + formatDuration(p0.rate) + ' starting from ' + starting + (p0.duration ? ' - ' + new Date(p0.start.getTime() + p0.duration).toLocaleTimeString(undefined, timeOptions) : '')
 }
 
 export function getScheduleDescription(p0: ParsedCron | ParsedRate, isRateExpression = false, tz = 'utc' as 'local' | 'utc'): string {
-    if (isRateExpression) return getRateDesc(<ParsedRate>p0)
+    if (isRateExpression) return getRateDesc(<ParsedRate>p0, tz)
     return getCronDesc(<ParsedCron>p0, tz)
 }
 
@@ -150,7 +170,7 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
     return desc;
 }
 
-export default function formatDuration( duration: number ): string {
+export default function formatDuration(duration: number): string {
     const time = {
         week: Math.floor(duration / 86400 / 7),
         day: Math.floor(duration / 86400) % 7,
@@ -159,7 +179,7 @@ export default function formatDuration( duration: number ): string {
         second: Math.floor(duration / 1) % 60,
     };
     return Object.entries(time)
-    .filter(val => val[1] !== 0)
-    .map(([key, val]) => `${val} ${key}${val !== 1 ? 's' : ''}`)
-    .join(', ');
+        .filter(val => val[1] !== 0)
+        .map(([key, val]) => `${val} ${key}${val !== 1 ? 's' : ''}`)
+        .join(', ');
 }

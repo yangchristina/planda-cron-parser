@@ -1,5 +1,6 @@
 import { logger } from '../logger';
 import { parse, getScheduleDescription } from '../../lib'
+import EventCronParser from '../..';
 
 test('should generate readable schedule description', () => {
     const cronsUTC = [
@@ -42,6 +43,34 @@ test('should generate readable schedule description', () => {
     cronsLocal.forEach(([cron, itShouldBe]) => {
         const parsed = parse(cron);
         const desc = getScheduleDescription(parsed, false, 'local');
+        logger.debug(desc, { label: cron });
+        expect(desc).toBe(itShouldBe);
+    });
+});
+
+// TODO, what happens if duration
+test('rate - should generate readable schedule description', () => {
+    const ratesUTC = [
+        ['rate(2 days, 3600000)', Date.UTC(2020, 5, 9, 7, 30) , "Every 2 days starting from Tuesday, June 9, 7:30 AM - 8:30 AM"],
+        ['rate(1 minute)', Date.UTC(2020, 5, 9, 7, 30) , "Every 1 minute starting from Tuesday, June 9, 7:30 AM"],
+    ]
+
+    const ratesLocal = [
+        ['rate(2 days, 3600000)', new Date(2020, 5, 9, 7, 30) , "Every 2 days starting from Tuesday, June 9, 7:30 AM - 8:30 AM"],
+        ['rate(1 minute)', new Date(2020, 5, 9, 7, 30) , "Every 1 minute starting from Tuesday, June 9, 7:30 AM"],
+    ]
+
+    ratesUTC.forEach(([cron, start, itShouldBe]) => {
+        const parsed = new EventCronParser(cron as string, start as number);
+        const desc = parsed.desc('utc');
+        logger.debug(desc, { label: cron });
+        expect(desc).toBe(itShouldBe);
+    });
+
+    ratesLocal.forEach(([cron, start, itShouldBe]) => {
+        const parsed = new EventCronParser(cron as string, start as Date);
+        const desc = parsed.desc('local')
+        // const desc = getScheduleDescription(parsed, true, 'local');
         logger.debug(desc, { label: cron });
         expect(desc).toBe(itShouldBe);
     });
