@@ -10,17 +10,12 @@ import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
  * https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions
  */
 
-
-// TODO: rate expressions, rate()
-
 /**
  * Every 5 minutes: rate(5 minutes, 3600000)
  * Every hour: rate(1 hour)
  * Every seven days: rate(7 days)
  */
 
-
-// TODO make two classes, one for Event parsing + one for Rate parsing
 class EventCronParser {
     #cron: string; // can be either a cron or a rate expression
     parsedCron: ParsedCron | ParsedRate;
@@ -169,7 +164,6 @@ class EventCronParser {
         validateParsedRule(parsedCron.months)
         validateParsedRule(parsedCron.daysOfWeek)
         validateParsedRule(parsedCron.years)
-
     }
 }
 
