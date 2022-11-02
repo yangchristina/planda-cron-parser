@@ -2,12 +2,16 @@
 import { logger } from '../logger';
 import EventCronParser from '../../'
 
-function testMultipleNext(crons: any[], start: Date, offsetFromPrev = 60000) {
+function testMultipleNext(crons: any[], start: Date, inclusive = false) {
     crons.forEach(({ cron, should: theyShouldBe }) => {
-        const event = new EventCronParser(cron)
+        const event = new EventCronParser(cron, start)
         let occurence: Date = start;
         theyShouldBe.forEach((itShouldBe: any, i: number) => {
-            occurence = event.next(new Date(occurence.getTime() + offsetFromPrev)) || new Date(0);
+            if (i % 2 == 0) {
+                occurence = event.next(new Date(occurence.getTime()), inclusive) || new Date(0);
+            } else {
+                occurence = event.next() || new Date(0)
+            }
             // logger.debug(cron, { label: `${i}:${occurence?.toUTCString()}` });
             expect(occurence?.toUTCString()).toBe(itShouldBe);
         });
@@ -232,5 +236,8 @@ test('next-rate-1', ()=> {
         },
     ];
 
-    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)), 0)
+    console.log('date-next')
+    console.log(new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)).toUTCString())
+
+    testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)))
 })

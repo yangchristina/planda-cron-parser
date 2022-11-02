@@ -1,5 +1,5 @@
 import { parse, ParsedCron, ParsedRate, validateParsedRule, } from './lib/parse';
-import { next } from './lib/next';
+import { nextCron, nextRate } from './lib/next';
 import { getScheduleDescription } from './lib/desc'
 import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
 
@@ -45,19 +45,15 @@ class EventCronParser {
 
     // if from is given, return next after or equal to from date
     // if from not given, give next after prev, prev is initialized as new Date(0)
-    next(from?: Date | number) {
+    next(from?: Date | number, inclusive = false) {
         if (this.#isRateExpression) {
-            const goFrom = from || this.#prevDate || null
-            if (goFrom === null) return null
-            const nextTime = new Date(goFrom).getTime() + (<ParsedRate>this.parsedCron).rate * 1000
-
-            if (this.parsedCron.end && (nextTime + this.parsedCron.duration) > this.parsedCron.end.getTime()) return null
-
-            return new Date(nextTime)
+            let nextDate = nextRate(<ParsedRate>this.parsedCron, from || this.#prevDate, inclusive)
+            this.#prevDate = nextDate
+            return nextDate
         }
         const cron = this.parsedCron as ParsedCron
-        if (from !== undefined) this.#prevDate = next(cron, new Date(from), cron.duration) // including from
-        else if (this.#prevDate) this.#prevDate = next(cron, new Date(this.#prevDate.getTime() + cron.duration + 60000), cron.duration) // !!! not sure if i should be adding duration but seems right in next()?
+        if (from !== undefined) this.#prevDate = nextCron(cron, new Date(from), cron.duration, inclusive) // including from
+        else if (this.#prevDate) this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, inclusive) // !!! not sure if i should be adding duration but seems right in next()?
         return this.#prevDate;
     }
 
@@ -81,6 +77,7 @@ class EventCronParser {
         }
     }
 
+    // check if an event occurs within the range start-end i think exclusive but not sure
     isInRange(start: number | Date, end: number | Date) {
         const first = this.next(new Date(start))
         return first && first.getTime() < end
