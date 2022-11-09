@@ -27,10 +27,18 @@ test('should generate readable schedule description', () => {
         ],
     ]
 
+
+    // problem: crons are in utc, how to convert to local?
+    const today = new Date()
+    today.setUTCHours(15)
+    const eighteen = new Date()
+    eighteen.setUTCHours(18)
     const cronsLocal = [
-        ['0 15 * * ? * 3600000', 'every day from 8:00 AM - 9:00 AM'],
-        ['0 15 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 8:00 AM - 9:00 AM'],
-        ['0 18 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 11:00 AM - 12:00 PM']
+        ['0 15 * * ? * 3600000', `every day from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
+        ['0 15 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
+        ['0 15 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
+        ['0 18 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${eighteen.getHours()}:00 AM - ${eighteen.getHours()+1}:00 AM`],
+        // ['0 18 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 11:00 AM - 12:00 PM']
     ]
 
     cronsUTC.forEach(([cron, itShouldBe]) => {
