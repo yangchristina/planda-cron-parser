@@ -56,7 +56,6 @@ test('should generate readable schedule description', () => {
     });
 });
 
-// TODO, what happens if duration
 test('rate - should generate readable schedule description', () => {
     const ratesUTC = [
         ['rate(2 days, 3600000)', Date.UTC(2020, 5, 9, 7, 30) , "Every 2 days starting from Tuesday, June 9, 7:30 AM - 8:30 AM"],
