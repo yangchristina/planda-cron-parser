@@ -1,6 +1,6 @@
 {
     "name": "event-cron-parser",
-    "version": "1.0.15",
+    "version": "1.0.16",
     "description": "A util to parse recurring events scheduled using cron-like syntax. Uses aws cron syntax, with a few additional features including durations, and limits on earliest and latest possible dates for the cron expression",
     "keywords": [
         "aws",
