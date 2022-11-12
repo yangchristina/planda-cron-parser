@@ -178,7 +178,10 @@ class EventCronParser {
     }
 
     setDaysOfWeek(daysOfWeek: number[], timezone = 'utc' as 'local' | 'utc') {
-        if (this.#isRateExpression) return []
+        if (this.#isRateExpression) {
+            this.setCron("0 0 ? *  *")
+        }
+
         const parsedCron = <ParsedCron>this.parsedCron
         // 1. convert daysOfWeek to UTC
         // 2. update cron
