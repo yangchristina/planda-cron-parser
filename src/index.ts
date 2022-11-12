@@ -64,7 +64,7 @@ class EventCronParser {
 
     // !!! untested
     // @ts-expect-error
-    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = 0, start=this.earliestDate, end=this.latestDate) {
+    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = 0, start = this.earliestDate, end = this.latestDate) {
         this.#isRateExpression = true;
         const newCron = `rate(${value || 1} ${unit || 'days'}, ${duration})`
         this.#cron = newCron
@@ -74,7 +74,7 @@ class EventCronParser {
     }
 
     // !!! untested
-    setCron(cron: string, start=this.earliestDate, end = this.latestDate) {
+    setCron(cron: string, start = this.earliestDate, end = this.latestDate) {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
         } else {
@@ -200,6 +200,21 @@ class EventCronParser {
 
     isRateExpression() {
         return this.#isRateExpression
+    }
+
+    setDuration(duration: number) {
+        this.parsedCron.duration = duration
+        if (this.#isRateExpression) {
+            const arr = this.#cron.substring(5, this.#cron.length - 1).split(',')
+            arr[1] = duration.toString()
+
+            this.#cron = 'rate(' + arr.join(',') + ')'
+            return
+        }
+
+        const split = this.#cron.split(' ')
+        split[6] = duration.toString()
+        this.#cron = split.join(' ')
     }
 
     validate() {

@@ -14,7 +14,7 @@ export interface ParsedCron {
 
 export interface ParsedRate {
     rate: number, // in seconds
-    duration: number, // in seconds
+    duration: number, // in ms
     value: number,
     unit: string,
     start: Date,
@@ -154,7 +154,7 @@ const rateUnits = {
     'days': 3600*24
 }
 
-// takes in ex. rate(1 hour, 360000) OR rate(360 minutes)
+// takes in ex. rate(1 hour, 3600000) OR rate(360 minutes)
 export function parseRateExpression(expression: string, start?: Date | number, end?: Date | number): ParsedRate {
     const exp = expression.substring(5, expression.length - 1).split(',')
     // const exp = expression.split(',')
