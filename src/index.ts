@@ -52,7 +52,6 @@ class EventCronParser {
         return this.#prevDate;
     }
 
-
     // export interface ParsedRate {
     //     rate: number, // in seconds
     //     duration: number, // in seconds
@@ -209,12 +208,12 @@ class EventCronParser {
             arr[1] = duration.toString()
 
             this.#cron = 'rate(' + arr.join(',') + ')'
-            return
+        } else {
+            const split = this.#cron.split(' ')
+            split[6] = duration.toString()
+            this.#cron = split.join(' ')
         }
-
-        const split = this.#cron.split(' ')
-        split[6] = duration.toString()
-        this.#cron = split.join(' ')
+        return this.#cron;
     }
 
     validate() {
