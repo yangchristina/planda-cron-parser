@@ -122,6 +122,20 @@ class EventCronParser {
         return getLocalDays(<ParsedCron>this.parsedCron)
     }
 
+    getUTCMinutes() {
+        if (this.#isRateExpression) {
+            return this.earliestDate.getUTCMinutes()
+        }
+        return (this.parsedCron as ParsedCron).minutes[0];
+    }
+
+    getUTCHours() {
+        if (this.#isRateExpression) {
+            return this.earliestDate.getUTCHours()
+        }
+        return (this.parsedCron as ParsedCron).hours[0];
+    }
+
     // hours and minutes are in UTC, preserveLocalDaysOfWeek keeps the local days the same regardless of how hour + minutes change 
     setUTCHours(hours: number[], minutes?: number[], preserveLocalDaysOfWeek = false) {
         if (this.#isRateExpression) {
