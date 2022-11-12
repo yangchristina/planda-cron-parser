@@ -25,7 +25,7 @@ class EventCronParser {
     #isRateExpression: boolean;
 
     // cron can be rate as well, maybe call it schedule instead?
-    constructor(cron: string, start?: Date | number, end?: Date | number, duration?: number) {
+    constructor(cron: string, start?: Date | number, end?: Date | number) {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
         } else {
@@ -50,6 +50,27 @@ class EventCronParser {
         if (from !== undefined) this.#prevDate = nextCron(cron, new Date(from), cron.duration, inclusive) // including from
         else if (this.#prevDate) this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, inclusive) // !!! not sure if i should be adding duration but seems right in next()?
         return this.#prevDate;
+    }
+
+    setRate(value: number, unit: string, duration = 0, start=this.earliestDate, end=this.latestDate) {
+        this.#isRateExpression = true;
+        const newCron = `rate(${value} ${unit}, ${duration})`
+        this.#cron = newCron
+        this.latestDate = end;
+        this.earliestDate = start;
+        this.parsedCron = parse(newCron, start, end || undefined, true);
+    }
+
+    setCron(cron: string, start=this.earliestDate, end = this.latestDate) {
+        if (cron.startsWith('rate(') && cron.at(-1) === ')') {
+            this.#isRateExpression = true;
+        } else {
+            this.#isRateExpression = false;
+        }
+        this.latestDate = end;
+        this.earliestDate = start;
+        this.#cron = cron;
+        this.parsedCron = parse(this.#cron, start, end || undefined, this.#isRateExpression);
     }
 
     // TODO !!!
