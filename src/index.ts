@@ -52,6 +52,7 @@ class EventCronParser {
         return this.#prevDate;
     }
 
+    // !!! untested
     setRate(value: number, unit: string, duration = 0, start=this.earliestDate, end=this.latestDate) {
         this.#isRateExpression = true;
         const newCron = `rate(${value} ${unit}, ${duration})`
@@ -61,6 +62,7 @@ class EventCronParser {
         this.parsedCron = parse(newCron, start, end || undefined, true);
     }
 
+    // !!! untested
     setCron(cron: string, start=this.earliestDate, end = this.latestDate) {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
