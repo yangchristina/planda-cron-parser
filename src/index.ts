@@ -205,7 +205,9 @@ class EventCronParser {
     validate() {
         if (isNaN(this.parsedCron.duration)) throw new Error('invalid duration')
         if (this.#isRateExpression) {
-            return // validated in parse
+            if ((this.parsedCron as ParsedRate).value <= 0) throw new Error('invalid value')
+            return
+            // rest is validated in parse
         }
         const parsedCron = <ParsedCron>this.parsedCron
         validateParsedRule(parsedCron.minutes)
