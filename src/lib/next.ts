@@ -102,10 +102,12 @@ export function nextRate(rate: ParsedRate, from: Date | number | null, inclusive
     if (from == null) return null
     const fromTime = new Date(from).getTime()
     const startTime = rate.start.getTime()
-    const offset = fromTime - startTime
-    const occurences = (inclusive ? Math.ceil(offset / (rate.rate * 1000)) : 1 + Math.floor(offset / (rate.rate * 1000)))
-    const nextTime = occurences * (rate.rate * 1000) + startTime
 
-    if (rate.end && nextTime + rate.duration > rate.end.getTime()) return null
-    return new Date(nextTime)
+    let time = startTime;
+    while(inclusive ? time < fromTime : time <= fromTime) {
+        time += rate.rate * 1000
+    }
+
+    if (rate.end && time + rate.duration > rate.end.getTime()) return null
+    return new Date(time)
 }
