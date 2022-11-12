@@ -52,10 +52,21 @@ class EventCronParser {
         return this.#prevDate;
     }
 
+
+    // export interface ParsedRate {
+    //     rate: number, // in seconds
+    //     duration: number, // in seconds
+    //     value: number,
+    //     unit: string,
+    //     start: Date,
+    //     end: Date | null,
+    // }
+
     // !!! untested
-    setRate(value: number, unit: string, duration = 0, start=this.earliestDate, end=this.latestDate) {
+    // @ts-expect-error
+    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = 0, start=this.earliestDate, end=this.latestDate) {
         this.#isRateExpression = true;
-        const newCron = `rate(${value} ${unit}, ${duration})`
+        const newCron = `rate(${value || 1} ${unit || 'days'}, ${duration})`
         this.#cron = newCron
         this.latestDate = end;
         this.earliestDate = start;
