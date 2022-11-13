@@ -171,7 +171,8 @@ export function parseRateExpression(expression: string, start?: Date | number, e
     return {
         rate: rateUnits[unit] * val, // in seconds
         duration: exp.length > 1 ? parseInt(exp[1].trim()) : 0, 
-        value: val, unit, start: start ? new Date(start) : new Date(0) , 
+        value: val, unit, 
+        start: start ? new Date(start) : new Date(0), 
         end: end ? new Date(end) : null
     }
 }

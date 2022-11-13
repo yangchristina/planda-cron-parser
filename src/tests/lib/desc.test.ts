@@ -65,6 +65,7 @@ test('rate - should generate readable schedule description', () => {
     const ratesLocal = [
         ['rate(2 days, 3600000)', new Date(2020, 5, 9, 7, 30) , "Every 2 days starting from Tuesday, June 9, 7:30 AM - 8:30 AM"],
         ['rate(1 minute)', new Date(2020, 5, 9, 7, 30) , "Every 1 minute starting from Tuesday, June 9, 7:30 AM"],
+        ['rate(14 days, 0)', new Date(1668240000000), "Every 2 weeks starting from Saturday, November 12, 12:00 AM"]
     ]
 
     ratesUTC.forEach(([cron, start, itShouldBe]) => {
