@@ -19,11 +19,6 @@ values in ** are optional, can be omitted
 
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
 
-## Installation
-```sh
-npm install --save event-cron-parser
-```
-
 ## Specs
 
 [AWS Cron Expression specs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions)
