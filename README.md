@@ -1,18 +1,28 @@
 # Recuring Events Cron Parser
 
+<p align="left">
+  <a href="https://www.npmjs.com/package/event-cron-parser"><img src="https://img.shields.io/npm/v/event-cron-parser" alt="Stable Release" /></a>
+  <a href="./LICENSE"><img allt="MIT License" src="https://badgen.now.sh/badge/license/MIT"/></a>
+</p>
+
 A fork of [@aws-cron-parser](https://github.com/beemhq/aws-cron-parser.git)
 
 NOTE: class not fully tested yet, use at own discretion
 
-Using aws cron syntax, with a few additional features, to schedule recurring events. 
+Using aws cron syntax, with a few additional features, to schedule recurring events.
 Supports events with durations, and can pass a time interval into parser that specifies the time range the cron can occur in.
 
 Typescript support.
 
-Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `  
+Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `
 values in ** are optional, can be omitted
 
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
+
+## Installation
+```sh
+npm install --save event-cron-parser
+```
 
 ## Specs
 
@@ -41,7 +51,7 @@ const cronParser = new AwsCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${durat
 // to get the first occurrence that ends after or at the same time as now
 let occurrence: Date | null = cronParser.next(new Date());
 
-// use without parameter to get the next occurrence following the previous one, 
+// use without parameter to get the next occurrence following the previous one,
 // or the first possible occurence of the cron expression if next has not been called yet
 occurrence = cronParser.next();
 
