@@ -28,7 +28,8 @@
         "test": "jest built/tests/**",
         "prepublishOnly": "tsc",
         "benchmark": "node built/benchmark.js",
-        "test1": "jest built/tests/** -t 'test parse and next local #1'"
+        "test1": "jest built/tests/** -t 'test parse and next local #1'",
+        "release": "npm run tsc && npm version patch && npm publish"
     },
     "dependencies": {
         "number-to-words": "^1.2.4"
