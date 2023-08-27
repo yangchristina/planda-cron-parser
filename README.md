@@ -36,7 +36,7 @@ Methods so far: `parse`, `next`, `range`, `isInRange`, `desc`, `getLocalDays`, `
 
 `validate` throws error when called if the cron is invalid
 ```js
-import AwsCronParser from "aws-cron-parser";
+import AwsCronParser from "event-cron-parser";
 
 const duration = 3600000 // in milliseconds
 
