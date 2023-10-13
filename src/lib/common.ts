@@ -64,7 +64,6 @@ export const arrayFindFirst = (a: any[], f: any) => {
 export const arrayFindLast = (a: any[], f: any) => {
     // note: a.slice().reverse().find(f) is less efficient
     for (let i = a.length - 1; i >= 0; i--) {
-        // eslint-disable-next-line security/detect-object-injection
         const e = a[i];
         if (f(e)) {
             return e;

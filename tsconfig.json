@@ -12,7 +12,6 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
-        "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "skipLibCheck": true,
         "experimentalDecorators": true,

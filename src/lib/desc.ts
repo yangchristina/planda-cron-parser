@@ -36,7 +36,8 @@ const joinMultipleWords = (words: string[]) => {
 };
 
 const checkCurrentlyUnsupported = (p: ParsedCron) => {
-    for (const part of ['months', 'daysOfMonth', 'daysOfWeek']) {
+    const dateUnits = ['months', 'daysOfMonth', 'daysOfWeek'] as const
+    for (const part of dateUnits) {
         const found = p[part].find((e: string | number) => typeof e !== 'number');
         if (found) return true;
     }
@@ -121,7 +122,7 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
     const p = { ...p0 }
     let desc = '';
 
-    // const 
+    // const
     if (tz == 'local') {
         // won't work a lot if there are multiple hours and minutes, only follows first hour and first minute
         p.daysOfWeek = p.daysOfWeek.map(dow => {

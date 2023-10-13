@@ -147,10 +147,10 @@ export function parse(cron: string, start?: Date | number, end?: Date | number, 
 // in seconds
 const rateUnits = {
     'minute': 60,
-    'minutes': 60, 
-    'hour': 3600, 
-    'hours': 3600, 
-    'day': 3600*24, 
+    'minutes': 60,
+    'hour': 3600,
+    'hours': 3600,
+    'day': 3600*24,
     'days': 3600*24
 }
 
@@ -163,16 +163,17 @@ export function parseRateExpression(expression: string, start?: Date | number, e
     if (rate.length !== 2) throw new Error('invalid rate expression')
     const val = parseInt(rate[0].trim())
     if (Number.isNaN(val)) throw new Error('invalid rate expression value')
-    const unit = rate[1];
+    const unit = rate[1] as keyof typeof rateUnits;
+
     if (!rateUnits[unit]) throw new Error('invalid rate expression unit')
 
     // prob better to just store cron as milliseconds or seconds instead
 
     return {
         rate: rateUnits[unit] * val, // in seconds
-        duration: exp.length > 1 ? parseInt(exp[1].trim()) : 0, 
-        value: val, unit, 
-        start: start ? new Date(start) : new Date(0), 
+        duration: exp.length > 1 ? parseInt(exp[1].trim()) : 0,
+        value: val, unit,
+        start: start ? new Date(start) : new Date(0),
         end: end ? new Date(end) : null
     }
 }

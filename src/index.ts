@@ -109,7 +109,7 @@ class EventCronParser {
     // check if an event occurs within the range start-end i think exclusive but not sure
     isInRange(start: number | Date, end: number | Date) {
         const first = this.next(new Date(start))
-        return first && first.getTime() < end
+        return first && first.getTime() < new Date(end).getTime()
     }
 
     desc(timezone = 'local' as 'local' | 'utc') {
