@@ -63,9 +63,10 @@ class EventCronParser {
 
     // !!! untested
     // @ts-expect-error
-    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = 0, start = this.earliestDate, end = this.latestDate) {
+    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = undefined, start = this.earliestDate, end = this.latestDate) {
         this.#isRateExpression = true;
-        const newCron = `rate(${value || 1} ${unit || 'days'}, ${duration})`
+        let newDuration = duration !== undefined ? duration : (this.parsedCron.duration || 0)
+        const newCron = `rate(${value || 1} ${unit || 'days'}, ${newDuration})`
         this.#cron = newCron
         this.latestDate = end;
         this.earliestDate = start;
@@ -135,7 +136,7 @@ class EventCronParser {
         return (this.parsedCron as ParsedCron).hours[0];
     }
 
-    // hours and minutes are in UTC, preserveLocalDaysOfWeek keeps the local days the same regardless of how hour + minutes change 
+    // hours and minutes are in UTC, preserveLocalDaysOfWeek keeps the local days the same regardless of how hour + minutes change
     setUTCHours(hours: number[], minutes?: number[], preserveLocalDaysOfWeek = false) {
         if (this.#isRateExpression) {
             this.earliestDate.setUTCHours(hours[0], minutes && minutes[0])
