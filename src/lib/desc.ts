@@ -106,13 +106,18 @@ export function getRateDesc(p0: ParsedRate, tz: 'utc' | 'local') {
     //     month: 'long' as const,
     //     day: 'numeric' as const,
     // }
-    const starting = new Date(p0.start).toLocaleTimeString(undefined, options)
+    let starting = new Date(p0.start).toLocaleTimeString(undefined, options)
+    if (p0.duration) starting = starting.replace('at', 'from')
     return "Every " + formatDuration(p0.rate) + ' starting from ' + starting + (p0.duration ? ' - ' + new Date(p0.start.getTime() + p0.duration).toLocaleTimeString(undefined, timeOptions) : '')
 }
 
 export function getScheduleDescription(p0: ParsedCron | ParsedRate, isRateExpression = false, tz = 'utc' as 'local' | 'utc'): string {
     if (isRateExpression) return getRateDesc(<ParsedRate>p0, tz)
     return getCronDesc(<ParsedCron>p0, tz)
+}
+
+const toInt = (h: string | number) => {
+    return typeof h === 'string' ? parseInt(h) : h
 }
 
 /**
@@ -140,13 +145,14 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
             // return dow == 7 ? 1 : dow + 1
         })
         p.hours = p.hours.map(h => {
-            h = typeof h === 'string' ? parseInt(h) : h
+            h = toInt(h)
             const date1 = new Date()
             date1.setUTCHours(h)
             return date1.getHours()
         })
+        // why am i getting 60 for minutes?
         p.minutes.map(m => {
-            m = typeof m === 'string' ? parseInt(m) : m
+            m = toInt(m)
             const date2 = new Date()
             date2.setUTCMinutes(m)
             return date2.getMinutes()
@@ -160,14 +166,33 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
     if (p.daysOfMonth.length > 0) desc += handleDaysOfMonth(p); // don't think timezone has large effect so shall just ignore for now
     else if (p.daysOfWeek.length > 0) desc += handleDaysOfWeek(p);
 
-    const durationInMinutes = p.duration / 1000 / 60
 
-    const durationHours = Math.floor(durationInMinutes / 60)
-    const durationMinutes = durationInMinutes % 60
+    if (perDay === 1) {
+        if (p.duration) {
+            const durationInMinutes = Math.round(p.duration / 1000 / 60)
 
-    // @ts-expect-error
-    if (perDay === 1) desc += p.duration ? ` from ${handleOncePerDay(p)} - ${handleOncePerDay({ ...p, minutes: p.minutes.map(x => x + durationMinutes), hours: p.hours.map(x => x + durationHours) })}` : ` at ${handleOncePerDay(p)}`;
+            let durationMinutes = durationInMinutes % 60
+            let durationHours = Math.floor(durationInMinutes / 60)
 
+            // if all goes over 60, add one to durationHours
+            while (p.minutes.every(x=>(toInt(x) + durationMinutes) >= 60)) {
+                durationHours++
+                durationMinutes -= 60
+            }
+
+            const end = { // what if it wraps?
+                ...p,
+                minutes: p.minutes.map(x => {
+                    return toInt(x) + durationMinutes
+                }),
+                hours: p.hours.map(x => toInt(x) + durationHours) // TODO/WARNING: possible hour > 23
+            }
+            desc += ` from ${handleOncePerDay(p)} - ${handleOncePerDay(end)}`;
+        } else {
+            desc += ` at ${handleOncePerDay(p)}`;
+        }
+        // desc += p.duration ? ` from ${handleOncePerDay(p)} - ${handleOncePerDay({ ...p, minutes: p.minutes.map(x => x + durationMinutes), hours: p.hours.map(x => x + durationHours) })}` : ` at ${handleOncePerDay(p)}`;
+    }
     return desc;
 }
 

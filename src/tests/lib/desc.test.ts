@@ -37,7 +37,7 @@ test('should generate readable schedule description', () => {
         ['0 15 * * ? * 3600000', `every day from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
         ['0 15 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
         ['0 15 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${today.getHours()}:00 AM - ${today.getHours()+1}:00 AM`],
-        ['0 18 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${eighteen.getHours()}:00 AM - ${eighteen.getHours()+1}:00 AM`],
+        ['0 18 ? * 2,4,6 * 3600000', `every Monday, Wednesday, and Friday from ${eighteen.getHours()}:00 AM - ${eighteen.getHours()+1}:00 ${eighteen.getHours() >= 11 ? 'PM' : 'AM'}`], // this t
         // ['0 18 ? * 2,4,6 * 3600000', 'every Monday, Wednesday, and Friday from 11:00 AM - 12:00 PM']
     ]
 

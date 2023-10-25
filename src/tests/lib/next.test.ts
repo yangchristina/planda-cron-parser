@@ -236,8 +236,8 @@ test('next-rate-1', ()=> {
         },
     ];
 
-    console.log('date-next')
-    console.log(new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)).toUTCString())
+    // console.log('date-next')
+    // console.log(new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)).toUTCString())
 
     testMultipleNext(crons, new Date(Date.UTC(2020, 5 - 1, 8, 9, 30, 0, 0)))
 })
