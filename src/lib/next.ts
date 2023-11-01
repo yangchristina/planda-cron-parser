@@ -99,7 +99,6 @@ export function nextCron(parsed: ParsedCron, from: Date, duration: number, optio
         // check for difference in daylight savings
         const start = new Date(parsed.start)
         let offsetDiff = start.getTimezoneOffset() - nextOccurence.getTimezoneOffset()
-        console.log('dst', start, nextOccurence, offsetDiff)
         if (offsetDiff !== 0) {
             nextOccurence.setMinutes(nextOccurence.getMinutes() - offsetDiff)
         }
