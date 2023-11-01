@@ -32,7 +32,7 @@ class EventCronParser {
         } else {
             this.#isRateExpression = false;
         }
-        this.tz = tz || 'utc'
+        this.tz = tz || 'local'
         this.#cron = cron;
         this.#prevDate = new Date(0) // first occurrence will still be after start, cuz start put in parse
         this.latestDate = end ? new Date(end) : null;
@@ -114,8 +114,8 @@ class EventCronParser {
         return first && first.getTime() < new Date(end).getTime()
     }
 
-    desc(timezone = 'local' as 'local' | 'utc') {
-        return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone)
+    desc(timezone?: 'local' | 'utc') {
+        return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone ?? this.tz)
     }
 
     // returns days of week in local time
@@ -179,7 +179,8 @@ class EventCronParser {
             this.setDaysOfWeek(localDays, 'local')
     }
 
-    setDaysOfWeek(daysOfWeek: number[], timezone = 'utc' as 'local' | 'utc') {
+    setDaysOfWeek(daysOfWeek: number[], timezone?: 'local' | 'utc') {
+        timezone = timezone ?? this.tz
         if (this.#isRateExpression) {
             this.setCron("0 0 ? *  *")
         }
