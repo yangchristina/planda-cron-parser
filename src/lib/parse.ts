@@ -7,9 +7,10 @@ export interface ParsedCron {
     months: ParsedRule;
     daysOfWeek: ParsedRule;
     years: ParsedRule;
-    duration: number, // in ms
-    start: Date, // this should affect years
-    end: Date | null,
+    duration: number; // in ms
+    start: Date; // this should affect years
+    end: Date | null;
+    tz?: 'utc' | 'local'
 }
 
 export interface ParsedRate {

@@ -10,10 +10,10 @@ const findOnce = (parsed: ParsedCron, from: Date): Date | null => {
 
     from = getLatestDate(from, parsed.start)
 
-    const cYear = from.getUTCFullYear(); // timezone === 'local' ? from.getFullYear() : 
+    const cYear = from.getUTCFullYear(); // timezone === 'local' ? from.getFullYear() :
     const cMonth = from.getUTCMonth() + 1; // timezone === 'local' ? from.getMonth() + 1 :
-    const cDayOfMonth = from.getUTCDate(); // timezone === 'local' ? from.getDate() : 
-    const cHour = from.getUTCHours(); // timezone === 'local' ? from.getHours() : 
+    const cDayOfMonth = from.getUTCDate(); // timezone === 'local' ? from.getDate() :
+    const cHour = from.getUTCHours(); // timezone === 'local' ? from.getHours() :
     const cMinute = from.getUTCMinutes(); // timezone === 'local' ? from.getMinutes() :
 
     const year = find(parsed.years, (c: number) => c >= cYear);
@@ -84,11 +84,27 @@ function getDate(year = 0, month = 1, dayOfMonth = 1, hour = 0, minute = 0) {
  * @param {*} parsed the value returned by "parse" function of this module
  * @param {*} from the Date to start from
  */
-export function nextCron(parsed: ParsedCron, from: Date, duration: number, inclusive = false) {
+interface NextCronOptions {
+    inclusive?: boolean;
+    tz?: 'local' | 'utc';
+}
+export function nextCron(parsed: ParsedCron, from: Date, duration: number, options?: NextCronOptions) {
+    const { inclusive = false, tz = 'utc' as 'local' | 'utc' } = options || {}
     // iter is just a safety net to prevent infinite recursive calls
     // because I'm not 100% sure this won't happen
     iter = 0;
     const nextOccurence = findOnce(parsed, new Date(((from.getTime() - duration + (inclusive ? 0 : 60000)) / 60000) * 60000))
+
+    if (tz === 'local' && nextOccurence) {
+        // check for difference in daylight savings
+        const start = new Date(parsed.start)
+        let offsetDiff = start.getTimezoneOffset() - nextOccurence.getTimezoneOffset()
+        console.log('dst', start, nextOccurence, offsetDiff)
+        if (offsetDiff !== 0) {
+            nextOccurence.setMinutes(nextOccurence.getMinutes() - offsetDiff)
+        }
+    }
+
     if (
         nextOccurence === null
         || parsed.end === null
@@ -104,7 +120,7 @@ export function nextRate(rate: ParsedRate, from: Date | number | null, inclusive
     const startTime = rate.start.getTime()
 
     let time = startTime;
-    while(inclusive ? time < fromTime : time <= fromTime) {
+    while (inclusive ? time < fromTime : time <= fromTime) {
         time += rate.rate * 1000
     }
 

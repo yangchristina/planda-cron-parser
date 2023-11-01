@@ -34,20 +34,20 @@ import EventCronParser from "../../index";
 //     });
 // }
 
-test('test range #1', () => {
+test('test range local #1', () => {
     const crons = ["0 1 ? * 4,6 * 4800000"]
 
     const start = 1678089600000;
     const end = 1678690799999;
 
     crons.forEach((cron) => {
-        const cronParser = new EventCronParser(cron)
+        const cronParser = new EventCronParser(cron, start - 60000, undefined, 'local')
         let dates = cronParser.range(start, end)
         const hour = dates[0].getHours()
         logger.debug(cron, { label: `itshouldbe ${hour}: ${dates.map(x=>x.getHours() + ' utc: ' + x.getUTCHours() +';')}` });
         logger.debug("dates", { label: `itshouldbe ${hour}: ${dates}` });
         expect(dates.every(d=>d.getHours() === hour)).toBe(true)
-        expect(dates.every(d=>d.getUTCHours() === hour)).toBe(true)
+        // expect(dates.every(d=>d.getUTCHours() === hour)).toBe(true)
     });
 });
 

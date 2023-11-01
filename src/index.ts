@@ -23,14 +23,16 @@ class EventCronParser {
     earliestDate: Date;
     latestDate: Date | null;
     #isRateExpression: boolean;
+    tz: 'local' | 'utc';
 
     // cron can be rate as well, maybe call it schedule instead?
-    constructor(cron: string, start?: Date | number, end?: Date | number) {
+    constructor(cron: string, start?: Date | number, end?: Date | number, tz?: 'local' | 'utc') {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
         } else {
             this.#isRateExpression = false;
         }
+        this.tz = tz || 'utc'
         this.#cron = cron;
         this.#prevDate = new Date(0) // first occurrence will still be after start, cuz start put in parse
         this.latestDate = end ? new Date(end) : null;
@@ -47,8 +49,8 @@ class EventCronParser {
             return nextDate
         }
         const cron = this.parsedCron as ParsedCron
-        if (from !== undefined) this.#prevDate = nextCron(cron, new Date(from), cron.duration, inclusive) // including from
-        else if (this.#prevDate) this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, inclusive) // !!! not sure if i should be adding duration but seems right in next()?
+        if (from !== undefined) this.#prevDate = nextCron(cron, new Date(from), cron.duration, { inclusive, tz: this.tz }) // including from
+        else if (this.#prevDate) this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, { inclusive, tz: this.tz }) // !!! not sure if i should be adding duration but seems right in next()?
         return this.#prevDate;
     }
 
