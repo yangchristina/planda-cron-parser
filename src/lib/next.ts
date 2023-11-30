@@ -98,13 +98,14 @@ export function nextCron(parsed: ParsedCron, from: Date, duration: number, optio
     }
     iter = 0;
     let nextOccurence = findFrom(from)
-    if (nextOccurence === null) return null
 
-    const adjustAmountMin = adjustDateForDST(nextOccurence, parsed, tz)
+    const adjustAmountMin = nextOccurence ? adjustDateForDST(nextOccurence, parsed, tz) : -60
 
     if (adjustAmountMin !== 0) {
-        nextOccurence = findFrom(new Date(from.getTime() + adjustAmountMin * 60000))
-        nextOccurence && adjustDateForDST(nextOccurence, parsed, tz)
+        const newNextOccurence = findFrom(new Date(from.getTime() + adjustAmountMin * 60000))
+        if (newNextOccurence && adjustAmountMin === adjustDateForDST(newNextOccurence, parsed, tz)) {
+            nextOccurence = newNextOccurence
+        }
     }
 
     if (
