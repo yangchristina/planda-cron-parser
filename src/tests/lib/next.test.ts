@@ -1,5 +1,4 @@
 // import AwsCronParser from '../..';
-import { logger } from '../logger';
 import EventCronParser from '../../'
 
 function testMultipleNext(crons: any[], start: Date, inclusive = false) {
