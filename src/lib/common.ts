@@ -1,4 +1,4 @@
-import { ParsedRule } from './parse';
+import { ParsedCron, ParsedRule } from './parse';
 
 const isWeekday = (year: number, month: number, day: number): boolean => {
     if (day < 1 || day > 31) {
@@ -70,3 +70,15 @@ export const arrayFindLast = (a: any[], f: any) => {
         }
     }
 };
+
+export const adjustDateForDST = (date: Date, parsedCron: ParsedCron, timezone: string) => {
+    if (timezone === 'local') {
+        // check for difference in daylight savings
+        let offsetDiff = date.getTimezoneOffset() - new Date(parsedCron.start).getTimezoneOffset()
+        if (offsetDiff !== 0) {
+            date.setMinutes(date.getMinutes() + offsetDiff)
+            return offsetDiff
+        }
+    }
+    return 0
+}

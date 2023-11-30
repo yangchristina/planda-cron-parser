@@ -34,7 +34,7 @@ test('should generate next & prev occurence for various crons', () => {
     ];
 
     crons.forEach(([cron, nextShouldBe, prevShouldBe]) => {
-        const parser = new EventCronParser(cron);
+        const parser = new EventCronParser(cron, undefined, undefined, 'utc');
 
         occurence = parser.next(base);
         // logger.debug(cron, { label: occurence?.toUTCString() });

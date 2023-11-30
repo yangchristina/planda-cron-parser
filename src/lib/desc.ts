@@ -1,6 +1,7 @@
 import * as n2w from 'number-to-words';
 import { nextUTCDay } from './local';
 import { ParsedCron, ParsedRate, } from './parse';
+import { adjustDateForDST } from './common';
 
 const monthNumberToWord = (n: number) => {
     return [
@@ -136,6 +137,7 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
             const date = nextUTCDay(Date.now(), dow - 1)
             date.setUTCHours(ruleAsNumber(p.hours[0]), ruleAsNumber(p.minutes[0]))
 
+            adjustDateForDST(date, p0, tz)
             return date.getDay() + 1
             // const min = (typeof p.hours[0] === 'string' ? parseInt(p.hours[0]) : p.hours[0]) * 60 + (typeof p.minutes[0] === 'string' ? parseInt(p.minutes[0]) : p.minutes[0])
             // const offsetInMinutes = new Date().getTimezoneOffset()
@@ -148,6 +150,7 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
             h = toInt(h)
             const date1 = new Date()
             date1.setUTCHours(h)
+            adjustDateForDST(date1, p0, tz)
             return date1.getHours()
         })
         // why am i getting 60 for minutes?
@@ -155,6 +158,7 @@ export function getCronDesc(p0: ParsedCron, tz = 'utc' as 'local' | 'utc'): stri
             m = toInt(m)
             const date2 = new Date()
             date2.setUTCMinutes(m)
+            adjustDateForDST(date2, p0, tz)
             return date2.getMinutes()
         })
     }

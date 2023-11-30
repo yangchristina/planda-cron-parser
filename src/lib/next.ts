@@ -1,4 +1,4 @@
-import { getDaysOfMonthFromDaysOfWeek, getDaysOfMonthForL, getDaysOfMonthForW, arrayFindFirst as find } from './common';
+import { getDaysOfMonthFromDaysOfWeek, getDaysOfMonthForL, getDaysOfMonthForW, arrayFindFirst as find, adjustDateForDST } from './common';
 import { ParsedCron, ParsedRate } from './parse';
 
 let iter: number;
@@ -92,16 +92,19 @@ export function nextCron(parsed: ParsedCron, from: Date, duration: number, optio
     const { inclusive = false, tz = 'utc' as 'local' | 'utc' } = options || {}
     // iter is just a safety net to prevent infinite recursive calls
     // because I'm not 100% sure this won't happen
-    iter = 0;
-    const nextOccurence = findOnce(parsed, new Date(((from.getTime() - duration + (inclusive ? 0 : 60000)) / 60000) * 60000))
 
-    if (tz === 'local' && nextOccurence) {
-        // check for difference in daylight savings
-        const start = new Date(parsed.start)
-        let offsetDiff = start.getTimezoneOffset() - nextOccurence.getTimezoneOffset()
-        if (offsetDiff !== 0) {
-            nextOccurence.setMinutes(nextOccurence.getMinutes() - offsetDiff)
-        }
+    const findFrom = (from: Date) => {
+        return findOnce(parsed, new Date(((from.getTime() - duration + (inclusive ? 0 : 60000)) / 60000) * 60000))
+    }
+    iter = 0;
+    let nextOccurence = findFrom(from)
+    if (nextOccurence === null) return null
+
+    const adjustAmountMin = adjustDateForDST(nextOccurence, parsed, tz)
+
+    if (adjustAmountMin !== 0) {
+        nextOccurence = findFrom(new Date(from.getTime() + adjustAmountMin * 60000))
+        nextOccurence && adjustDateForDST(nextOccurence, parsed, tz)
     }
 
     if (

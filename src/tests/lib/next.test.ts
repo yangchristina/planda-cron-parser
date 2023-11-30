@@ -4,7 +4,7 @@ import EventCronParser from '../../'
 
 function testMultipleNext(crons: any[], start: Date, inclusive = false) {
     crons.forEach(({ cron, should: theyShouldBe }) => {
-        const event = new EventCronParser(cron, start)
+        const event = new EventCronParser(cron, start, undefined, 'utc')
         let occurence: Date = start;
         theyShouldBe.forEach((itShouldBe: any, i: number) => {
             if (i % 2 == 0) {
