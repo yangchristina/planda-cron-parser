@@ -94,15 +94,16 @@ export function nextCron(parsed: ParsedCron, from: Date, duration: number, optio
     // because I'm not 100% sure this won't happen
 
     const findFrom = (from: Date) => {
-        return findOnce(parsed, new Date(((from.getTime() - duration + (inclusive ? 0 : 60000)) / 60000) * 60000))
+        return findOnce(parsed, new Date(((from.getTime() - duration + (inclusive ? -60000 : 60000)) / 60000) * 60000))
     }
     iter = 0;
     let nextOccurence = findFrom(from)
 
-    const adjustAmountMin = nextOccurence ? adjustDateForDST(nextOccurence, parsed, tz) : -60
+
+    const adjustAmountMin = nextOccurence ? adjustDateForDST(nextOccurence, parsed, tz) : 60
 
     if (adjustAmountMin !== 0) {
-        const newNextOccurence = findFrom(new Date(from.getTime() + adjustAmountMin * 60000))
+        const newNextOccurence = findFrom(new Date(from.getTime() - adjustAmountMin * 60000))
         if (newNextOccurence && adjustAmountMin === adjustDateForDST(newNextOccurence, parsed, tz)) {
             nextOccurence = newNextOccurence
         }

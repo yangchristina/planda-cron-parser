@@ -1,5 +1,4 @@
 import EventCronParser from '../..';
-import { logger } from '../logger';
 
 test('test local #1', () => {
     const crons: (string | boolean)[][] = [
@@ -19,6 +18,6 @@ test('test local #1', () => {
         } catch (e: any) {
             if (itShouldBe) fail('should not have thrown error')
         }
-        logger.debug(cron, { label: cron });
+        // logger.debug(cron, { label: cron });
     });
 });

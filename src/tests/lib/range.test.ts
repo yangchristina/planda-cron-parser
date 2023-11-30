@@ -1,5 +1,4 @@
 // // import AwsCronParser from '../..';
-import { logger } from '../logger';
 // import EventCronParser from '../..'
 
 import EventCronParser from "../../index";
@@ -44,8 +43,8 @@ test('test range local #1', () => {
         const cronParser = new EventCronParser(cron, start - 60000, undefined, 'local')
         let dates = cronParser.range(start, end)
         const hour = dates[0].getHours()
-        logger.debug(cron, { label: `itshouldbe ${hour}: ${dates.map(x=>x.getHours() + ' utc: ' + x.getUTCHours() +';')}` });
-        logger.debug("dates", { label: `itshouldbe ${hour}: ${dates}` });
+        // logger.debug(cron, { label: `itshouldbe ${hour}: ${dates.map(x=>x.getHours() + ' utc: ' + x.getUTCHours() +';')}` });
+        // logger.debug("dates", { label: `itshouldbe ${hour}: ${dates}` });
         expect(dates.every(d=>d.getHours() === hour)).toBe(true)
         // expect(dates.every(d=>d.getUTCHours() === hour)).toBe(true)
     });

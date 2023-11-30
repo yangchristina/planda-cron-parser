@@ -44,7 +44,7 @@ test('should generate readable schedule description', () => {
     cronsUTC.forEach(([cron, itShouldBe]) => {
         const parsed = parse(cron);
         const desc = getScheduleDescription(parsed);
-        logger.debug(desc, { label: cron });
+        // logger.debug(desc, { label: cron });
         expect(desc).toBe(itShouldBe);
     });
 

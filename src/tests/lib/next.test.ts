@@ -28,14 +28,20 @@ function testCases(crons: any[], tz: 'utc' | 'local' = 'utc', duration = 0, opti
         const event = new EventCronParser(cron, start, undefined, tz)
         let occurence: Date = occurrence_arg ?? new Date(2022, 6, 5); // 'Tue Jul 05 2022 00:00:00 GMT-0700 (Pacific Daylight Time)'
         theyShouldBe.forEach((itShouldBe: any, i: number) => {
-            logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + duration + 60000)?.toString()}` });
+            // logger.debug(cron, { label: `arg-${i}:${new Date(occurence.getTime() + duration + 60000)?.toString()}` });
             occurence = event.next(new Date(occurence.getTime() + duration + 60000), undefined) || new Date(0);
-            logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
-            logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
+            // logger.debug(cron, { label: `${i}:${occurence?.toString()}` });
+            // logger.debug(cron, { label: `itshouldbe${i}:${itShouldBe}` });
             expect(tz === 'utc' ? occurence.toUTCString() : occurence?.toString()).toBe(itShouldBe);
         });
     });
 }
+
+test('near end timezone shift bug', ()=>{
+    const parser = new EventCronParser('0 23 ? * 4 * 3600000', new Date(2023, 8, 1), new Date(2023, 11, 1), 'local')
+    const next = parser.next(new Date(2023, 10, 29, 15, 30), true)
+    expect(next).toBeTruthy()
+})
 
 test('test local #1', () => {
     const crons: { cron: string; should: string[] }[] = [
