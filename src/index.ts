@@ -95,13 +95,13 @@ class EventCronParser {
 
     // returns all occurences that occur within given interval
     // includes occurances that start
-    range(start: number | Date, end: number | Date) {
-        const first = this.next(new Date(start))
+    range(start: number | Date, end: number | Date, inclusive?: boolean) {
+        const first = this.next(new Date(start), inclusive)
         const occurences: Date[] = []
         if (first === null) return occurences
         occurences.push(first)
         while (true) { // add end to while statement, using at(-1)
-            const occurence = this.next()
+            const occurence = this.next(undefined, inclusive)
             if (occurence === null ||
                 occurences[occurences.length - 1].getTime() >= new Date(end).getTime()) return occurences
             occurences.push(occurence)
