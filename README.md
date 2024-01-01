@@ -17,6 +17,11 @@ Typescript support.
 Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `
 values in ** are optional, can be omitted
 
+Hours: 0-23
+Day-of-month: 1-31
+Month: 1-12 or JAN-DEC
+Day-of-week: 1-7 or SUN-SAT
+
 This utility was built to process AWS Cron Expressions used by Amazon CloudWatch. It can support all the specs listed in the link below, including the special wildcards L W and #.
 
 ## Specs
