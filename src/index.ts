@@ -3,6 +3,8 @@ import { nextCron, nextRate } from './lib/next';
 import { getScheduleDescription } from './lib/desc'
 import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
 
+export * from './lib/local'
+
 /**
  * cron is assumed to be validated by AWS already
  * cron is always stored in UTC

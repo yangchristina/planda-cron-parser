@@ -36,9 +36,13 @@ export function convertLocalDaysOfWeekToUTC(daysOfWeek: number[], parsedCron: Pa
     })
 }
 
+const DAYS_OF_WEEK = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 export function getLocalDays(parsedCron: ParsedCron) {
     return parsedCron.daysOfWeek.map(dow => {
         dow = ruleAsNumber(dow)
+        if (isNaN(dow)) {
+            dow = DAYS_OF_WEEK.findIndex(x => x === dow) + 1
+        }
 
         const date = nextUTCDay(Date.now(), dow - 1)
         date.setUTCHours(ruleAsNumber(parsedCron.hours[0]), ruleAsNumber(parsedCron.minutes[0]))
