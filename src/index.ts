@@ -144,6 +144,7 @@ class EventCronParser {
     setUTCHours(hours: number[], minutes?: number[], preserveLocalDaysOfWeek = false) {
         if (this.#isRateExpression) {
             this.earliestDate.setUTCHours(hours[0], minutes && minutes[0])
+            this.parsedCron = parse(this.#cron, this.earliestDate, this.latestDate || undefined, this.#isRateExpression);
             return
         }
 
