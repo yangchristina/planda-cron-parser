@@ -1,20 +1,18 @@
-# Recuring Events Cron Parser
+# Recuring Events AWS Schedule Expressions Parser
 
 <p align="left">
   <a href="https://www.npmjs.com/package/event-cron-parser"><img src="https://img.shields.io/npm/v/event-cron-parser" alt="Stable Release" /></a>
   <a href="./LICENSE"><img allt="MIT License" src="https://badgen.now.sh/badge/license/MIT"/></a>
 </p>
 
-A fork of [@aws-cron-parser](https://github.com/beemhq/aws-cron-parser.git)
+Expanded [@aws-cron-parser](https://github.com/beemhq/aws-cron-parser.git) to support rate expressions, durations, date ranges, and more.
 
-NOTE: class not fully tested yet, use at own discretion
-
-Using aws cron syntax, with a few additional features, to schedule recurring events.
+Using aws cron/rate expression syntax, with a few additional features, to schedule recurring events.
 Supports events with durations, and can pass a time interval into parser that specifies the time range the cron can occur in.
 
 Typescript support.
 
-Syntax: `min hr dayOfMonth month dayOfWeek year *duration* `
+Syntax: `min hr dayOfMonth month dayOfWeek year *duration* ` OR `rate(value unit, *duration*)`
 values in ** are optional, can be omitted
 
 Hours: 0-23
@@ -26,7 +24,9 @@ This utility was built to process AWS Cron Expressions used by Amazon CloudWatch
 
 ## Specs
 
+[AWS Schedule Expression specs](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html)
 [AWS Cron Expression specs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions)
+[AWS Rate Expression specs](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rate-expressions.html)
 
 ## Installation
 
@@ -41,12 +41,12 @@ Methods so far: `parse`, `next`, `range`, `isInRange`, `desc`, `getLocalDays`, `
 
 `validate` throws error when called if the cron is invalid
 ```js
-import AwsCronParser from "event-cron-parser";
+import EventCronParser from "event-cron-parser";
 
 const duration = 3600000 // in milliseconds
 
 // first we need to parse the cron expression, can also include an earliest possible date and a latest possible date
-const cronParser = new AwsCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000)) // default tz is 'local', can use setTimezone to change, or pass into constructor, only timezones currently supported are local and utc (default)
+const cronParser = new EventCronParser(`9 * 7,9,11 5 ? 2020,2022,2024-2099 ${duration}`, new Date(), new Date(Date.now() + 5 * 86400000)) // default tz is 'local', can use setTimezone to change, or pass into constructor, only timezones currently supported are local and utc (default)
 
 // to get the first occurrence that ends after or at the same time as now
 let occurrence: Date | null = cronParser.next(new Date());
@@ -66,7 +66,7 @@ const isInRange: boolean = cronParser.isInRange(new Date(), Date.now() + 8640000
 const occurences: Date[] = cronParser.range(new Date(), Date.now() + 86400000);
 
 
-const cronParser2 = new AwsCronParser(`0 15 ? * 2,4,6 * 3600000`, new Date(), new Date(Date.now() + 5 * 86400000))
+const cronParser2 = new EventCronParser(`0 15 ? * 2,4,6 * 3600000`, new Date(), new Date(Date.now() + 5 * 86400000))
 
 // use desc to get a simple description of the cron
 console.log(cronParser.desc()); // default will give description in UTC
