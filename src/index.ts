@@ -2,8 +2,10 @@ import { parse, ParsedCron, ParsedRate, validateParsedRule, } from './lib/parse'
 import { nextCron, nextRate } from './lib/next';
 import { getScheduleDescription } from './lib/desc'
 import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
+import { EMPTY_CRON } from './lib/constants';
 
 export * from './lib/local'
+export * from './lib/constants'
 
 /**
  * cron is assumed to be validated by AWS already
@@ -185,7 +187,7 @@ class EventCronParser {
     setDaysOfWeek(daysOfWeek: number[], timezone?: 'local' | 'utc') {
         timezone = timezone ?? this.tz
         if (this.#isRateExpression) {
-            this.setCron("0 0 ? *  *")
+            this.setCron(EMPTY_CRON)
         }
 
         const parsedCron = <ParsedCron>this.parsedCron
