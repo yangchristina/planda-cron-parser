@@ -100,7 +100,7 @@ class EventCronParser {
 
     // returns all occurences that occur within given interval
     // includes occurances that start
-    range(start: number | Date, end: number | Date, inclusive?: boolean) {
+    range(start: DateInput, end: DateInput, inclusive?: boolean) {
         const first = this.next(new Date(start), inclusive)
         const occurences: Date[] = []
         if (first === null) return occurences
@@ -114,7 +114,7 @@ class EventCronParser {
     }
 
     // check if an event occurs within the range start-end i think exclusive but not sure
-    isInRange(start: number | Date, end: number | Date) {
+    isInRange(start: DateInput, end: DateInput) {
         const first = this.next(new Date(start))
         return first && first.getTime() < new Date(end).getTime()
     }
