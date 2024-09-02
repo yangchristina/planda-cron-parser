@@ -1,3 +1,5 @@
+import { DateInput } from "./types";
+
 export type ParsedRule = (string | number)[];
 
 export interface ParsedCron {
@@ -140,7 +142,7 @@ export function validateParsedRule(rule: ParsedRule) {
     })
 }
 
-export function parse(cron: string, start?: Date | number, end?: Date | number, isRateExpression = false): ParsedCron | ParsedRate {
+export function parse(cron: string, start?: DateInput, end?: DateInput, isRateExpression = false): ParsedCron | ParsedRate {
     if (isRateExpression) return parseRateExpression(cron, start, end)
     return parseCron(cron, start, end)
 }
@@ -156,7 +158,7 @@ const rateUnits = {
 }
 
 // takes in ex. rate(1 hour, 3600000) OR rate(360 minutes)
-export function parseRateExpression(expression: string, start?: Date | number, end?: Date | number): ParsedRate {
+export function parseRateExpression(expression: string, start?: DateInput, end?: DateInput): ParsedRate {
     const exp = expression.substring(5, expression.length - 1).split(',')
     // const exp = expression.split(',')
     const rate = exp[0].trim().split(' ')
@@ -179,7 +181,7 @@ export function parseRateExpression(expression: string, start?: Date | number, e
     }
 }
 
-export function parseCron(cron: string, start?: Date | number, end?: Date | number): ParsedCron {
+export function parseCron(cron: string, start?: DateInput, end?: DateInput): ParsedCron {
     const rules = cron.split(' ');
 
     return {

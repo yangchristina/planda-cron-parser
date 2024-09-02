@@ -3,6 +3,7 @@ import { nextCron, nextRate } from './lib/next';
 import { getScheduleDescription } from './lib/desc'
 import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
 import { EMPTY_CRON } from './lib/constants';
+import { DateInput } from './lib/types';
 
 export * from './lib/local'
 export * from './lib/constants'
@@ -30,7 +31,7 @@ class EventCronParser {
     tz: 'local' | 'utc';
 
     // cron can be rate as well, maybe call it schedule instead?
-    constructor(cron: string, start?: Date | number, end?: Date | number, tz?: 'local' | 'utc') {
+    constructor(cron: string, start?: DateInput, end?: DateInput, tz?: 'local' | 'utc') {
         if (cron.startsWith('rate(') && cron.at(-1) === ')') {
             this.#isRateExpression = true;
         } else {
@@ -46,7 +47,7 @@ class EventCronParser {
 
     // if from is given, return next after or equal to from date
     // if from not given, give next after prev, prev is initialized as new Date(0)
-    next(from?: Date | number, inclusive = false) {
+    next(from?: DateInput, inclusive = false) {
         if (this.#isRateExpression) {
             let nextDate = nextRate(<ParsedRate>this.parsedCron, from || this.#prevDate, inclusive)
             this.#prevDate = nextDate

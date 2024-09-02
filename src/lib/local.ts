@@ -1,6 +1,7 @@
+import { DateInput } from "./types"
 import { ParsedCron } from "./parse"
 export function nextLocalDay(
-    date: Date | number,
+    date: DateInput,
     day: number
 ) {
     date = new Date(date)
@@ -12,7 +13,7 @@ export function nextLocalDay(
 }
 
 export function nextUTCDay(
-    date: Date | number,
+    date: DateInput,
     day: number
 ): Date {
     date = new Date(date)

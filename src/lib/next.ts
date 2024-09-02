@@ -1,5 +1,6 @@
 import { getDaysOfMonthFromDaysOfWeek, getDaysOfMonthForL, getDaysOfMonthForW, arrayFindFirst as find, adjustDateForDST } from './common';
 import { ParsedCron, ParsedRate } from './parse';
+import { DateInput } from './types';
 
 let iter: number;
 const findOnce = (parsed: ParsedCron, from: Date): Date | null => {
@@ -118,7 +119,7 @@ export function nextCron(parsed: ParsedCron, from: Date, duration: number, optio
     // new Date((Math.floor(from.getTime() / 60000) + 1) * 60000)
 }
 
-export function nextRate(rate: ParsedRate, from: Date | number | null, inclusive = false) {
+export function nextRate(rate: ParsedRate, from: DateInput | null, inclusive = false) {
     if (from == null) return null
     const fromTime = new Date(from).getTime()
     const startTime = rate.start.getTime()
