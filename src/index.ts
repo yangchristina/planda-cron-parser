@@ -1,12 +1,12 @@
-import { parse, ParsedCron, ParsedRate, validateParsedRule, } from './lib/parse';
+import { parse, ParsedCron, ParsedRate, validateParsedRule } from './lib/parse';
 import { nextCron, nextRate } from './lib/next';
-import { getScheduleDescription } from './lib/desc'
-import { convertLocalDaysOfWeekToUTC, getLocalDays, } from './lib/local';
+import { getScheduleDescription } from './lib/desc';
+import { convertLocalDaysOfWeekToUTC, getLocalDays } from './lib/local';
 import { EMPTY_CRON } from './lib/constants';
 import { DateInput } from './lib/types';
 
-export * from './lib/local'
-export * from './lib/constants'
+export * from './lib/local';
+export * from './lib/constants';
 
 /**
  * cron is assumed to be validated by AWS already
@@ -37,9 +37,9 @@ class EventCronParser {
         } else {
             this.#isRateExpression = false;
         }
-        this.tz = tz || 'local'
+        this.tz = tz || 'local';
         this.#cron = cron;
-        this.#prevDate = new Date(0) // first occurrence will still be after start, cuz start put in parse
+        this.#prevDate = new Date(0); // first occurrence will still be after start, cuz start put in parse
         this.latestDate = end ? new Date(end) : null;
         this.earliestDate = start ? new Date(start) : new Date(0);
         this.parsedCron = parse(this.#cron, start, end, this.#isRateExpression);
@@ -49,13 +49,19 @@ class EventCronParser {
     // if from not given, give next after prev, prev is initialized as new Date(0)
     next(from?: DateInput, inclusive = false) {
         if (this.#isRateExpression) {
-            let nextDate = nextRate(<ParsedRate>this.parsedCron, from || this.#prevDate, inclusive)
-            this.#prevDate = nextDate
-            return nextDate
+            let nextDate = nextRate(<ParsedRate>this.parsedCron, from || this.#prevDate, inclusive);
+            this.#prevDate = nextDate;
+            return nextDate;
         }
-        const cron = this.parsedCron as ParsedCron
-        if (from !== undefined) this.#prevDate = nextCron(cron, new Date(from), cron.duration, { inclusive, tz: this.tz }) // including from
-        else if (this.#prevDate) this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, { inclusive, tz: this.tz }) // !!! not sure if i should be adding duration but seems right in next()?
+        const cron = this.parsedCron as ParsedCron;
+        if (from !== undefined)
+            this.#prevDate = nextCron(cron, new Date(from), cron.duration, { inclusive, tz: this.tz });
+        // including from
+        else if (this.#prevDate)
+            this.#prevDate = nextCron(cron, new Date(this.#prevDate.getTime() + cron.duration), cron.duration, {
+                inclusive,
+                tz: this.tz,
+            }); // !!! not sure if i should be adding duration but seems right in next()?
         return this.#prevDate;
     }
 
@@ -69,12 +75,17 @@ class EventCronParser {
     // }
 
     // !!! untested
-    // @ts-expect-error
-    setRate(value = this.parsedCron.value as number | undefined, unit = this.parsedCron.unit as string | undefined, duration = undefined, start = this.earliestDate, end = this.latestDate) {
+    setRate(
+        value = (this.parsedCron as Partial<ParsedRate>).value as number | undefined,
+        unit = (this.parsedCron as Partial<ParsedRate>).unit as string | undefined,
+        duration = undefined,
+        start = this.earliestDate,
+        end = this.latestDate,
+    ) {
         this.#isRateExpression = true;
-        let newDuration = duration !== undefined ? duration : (this.parsedCron.duration || 0)
-        const newCron = `rate(${value || 1} ${unit || 'days'}, ${newDuration})`
-        this.#cron = newCron
+        let newDuration = duration !== undefined ? duration : this.parsedCron.duration || 0;
+        const newCron = `rate(${value || 1} ${unit || 'days'}, ${newDuration})`;
+        this.#cron = newCron;
         this.latestDate = end;
         this.earliestDate = start;
         this.parsedCron = parse(newCron, start, end || undefined, true);
@@ -95,65 +106,89 @@ class EventCronParser {
 
     // TODO !!!
     prev() {
-        return
+        return;
     }
 
     // returns all occurences that occur within given interval
     // includes occurances that start
     range(start: DateInput, end: DateInput, inclusive?: boolean) {
-        const first = this.next(new Date(start), inclusive)
-        const occurences: Date[] = []
-        if (first === null) return occurences
-        occurences.push(first)
-        while (true) { // add end to while statement, using at(-1)
-            const occurence = this.next(undefined, inclusive)
-            if (occurence === null ||
-                occurences[occurences.length - 1].getTime() >= new Date(end).getTime()) return occurences
-            occurences.push(occurence)
+        const first = this.next(new Date(start), inclusive);
+        const occurences: Date[] = [];
+        if (first === null) return occurences;
+        occurences.push(first);
+        while (true) {
+            // add end to while statement, using at(-1)
+            const occurence = this.next(undefined, inclusive);
+            if (occurence === null || occurences[occurences.length - 1].getTime() >= new Date(end).getTime())
+                return occurences;
+            occurences.push(occurence);
         }
     }
 
     // check if an event occurs within the range start-end i think exclusive but not sure
     isInRange(start: DateInput, end: DateInput) {
-        const first = this.next(new Date(start))
-        return first && first.getTime() < new Date(end).getTime()
+        const first = this.next(new Date(start));
+        return first && first.getTime() < new Date(end).getTime();
     }
 
     desc(timezone?: 'local' | 'utc') {
-        return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone ?? this.tz)
+        return getScheduleDescription(this.parsedCron, this.#isRateExpression, timezone ?? this.tz);
     }
 
     // returns days of week in local time
-    getLocalDays() { // should only be called if cron not rate expression
-        if (this.#isRateExpression) return []
-        return getLocalDays(<ParsedCron>this.parsedCron)
+    getLocalDays() {
+        // should only be called if cron not rate expression
+        if (this.#isRateExpression) return [];
+        return getLocalDays(<ParsedCron>this.parsedCron);
     }
 
     getUTCMinutes() {
         if (this.#isRateExpression) {
-            return this.earliestDate.getUTCMinutes()
+            return this.earliestDate.getUTCMinutes();
         }
         return (this.parsedCron as ParsedCron).minutes[0];
     }
 
     getUTCHours() {
         if (this.#isRateExpression) {
-            return this.earliestDate.getUTCHours()
+            return this.earliestDate.getUTCHours();
         }
         return (this.parsedCron as ParsedCron).hours[0];
     }
 
     // hours and minutes are in UTC, preserveLocalDaysOfWeek keeps the local days the same regardless of how hour + minutes change
-    setUTCHours(hours: number[], minutes?: number[], preserveLocalDaysOfWeek = false) {
+    setUTCHours(
+        hours: number[],
+        minutes?: number[],
+        {
+            preserveLocalDaysOfWeek = false,
+            referenceDate = this.earliestDate,
+        }: { preserveLocalDaysOfWeek?: boolean; referenceDate?: number | string | Date } = {},
+    ) {
+        //  10:00 utc is 3:00 pdt and 2:00 pst
+        // pdt is 1 hour ahead
+        // now is -8, before was -7.
+        // -7 - (-8) = 1
+        // -7 is 1 hour ahead
+        // therefore 1 on pdt is 0 on pst
+        const refDate = new Date(referenceDate);
+        let offsetDiff = (this.earliestDate.getTimezoneOffset() - refDate.getTimezoneOffset()) / 60;
+        hours = hours.map((h) => h + offsetDiff);
+
         if (this.#isRateExpression) {
-            this.earliestDate.setUTCHours(hours[0], minutes && minutes[0])
-            this.parsedCron = parse(this.#cron, this.earliestDate, this.latestDate || undefined, this.#isRateExpression);
-            return
+            this.earliestDate.setUTCHours(hours[0], minutes && minutes[0]);
+            this.parsedCron = parse(
+                this.#cron,
+                this.earliestDate,
+                this.latestDate || undefined,
+                this.#isRateExpression,
+            );
+            return;
         }
 
-        const cron = <ParsedCron>this.parsedCron
+        const cron = this.parsedCron as ParsedCron;
 
-        const localDays = getLocalDays(cron)
+        const localDays = getLocalDays(cron);
         // if (preserveLocalDaysOfWeek) {
         //     const oldDate = new Date()
         //     oldDate.setUTCHours(this.parsedCron.hours[0] as number, this.parsedCron.minutes[0] as number,0,0)
@@ -171,75 +206,72 @@ class EventCronParser {
         //     }
         // }
 
-        const cronArray = this.#cron.split(' ')
-        cronArray[1] = hours.join(',')
-        if (minutes)
-            cronArray[0] = minutes.join(',')
-        this.#cron = cronArray.join(' ')
+        const cronArray = this.#cron.split(' ');
+        cronArray[1] = hours.join(',');
+        if (minutes) cronArray[0] = minutes.join(',');
+        this.#cron = cronArray.join(' ');
 
         cron.hours = hours
-        if (minutes)
-            cron.minutes = minutes
+        if (minutes) cron.minutes = minutes;
 
-        if (preserveLocalDaysOfWeek)
-            this.setDaysOfWeek(localDays, 'local')
+        if (preserveLocalDaysOfWeek) this.setDaysOfWeek(localDays, 'local');
     }
 
     setDaysOfWeek(daysOfWeek: number[], timezone?: 'local' | 'utc') {
-        timezone = timezone ?? this.tz
+        timezone = timezone ?? this.tz;
         if (this.#isRateExpression) {
-            this.setCron(EMPTY_CRON)
+            this.setCron(EMPTY_CRON);
         }
 
-        const parsedCron = <ParsedCron>this.parsedCron
+        const parsedCron = <ParsedCron>this.parsedCron;
         // 1. convert daysOfWeek to UTC
         // 2. update cron
-        const updated = timezone === 'utc' ? daysOfWeek : convertLocalDaysOfWeekToUTC(daysOfWeek, parsedCron)
-        const cronArray = this.#cron.split(' ')
-        cronArray[4] = updated.join(',')
-        this.#cron = cronArray.join(' ')
-        parsedCron.daysOfWeek = updated
+        const updated = timezone === 'utc' ? daysOfWeek : convertLocalDaysOfWeekToUTC(daysOfWeek, parsedCron);
+        const cronArray = this.#cron.split(' ');
+        cronArray[4] = updated.join(',');
+        this.#cron = cronArray.join(' ');
+        parsedCron.daysOfWeek = updated;
 
         return updated;
     }
 
     getCron() {
-        return this.#cron
+        return this.#cron;
     }
 
     isRateExpression() {
-        return this.#isRateExpression
+        return this.#isRateExpression;
     }
 
     setDuration(duration: number) {
-        this.parsedCron.duration = duration
+        this.parsedCron.duration = duration;
         if (this.#isRateExpression) {
-            const arr = this.#cron.substring(5, this.#cron.length - 1).split(',')
-            arr[1] = duration.toString()
+            const arr = this.#cron.substring(5, this.#cron.length - 1).split(',');
+            arr[1] = duration.toString();
 
-            this.#cron = 'rate(' + arr.join(',') + ')'
+            this.#cron = 'rate(' + arr.join(',') + ')';
         } else {
-            const split = this.#cron.split(' ')
-            split[6] = duration.toString()
-            this.#cron = split.join(' ')
+            const split = this.#cron.split(' ');
+            split[6] = duration.toString();
+            this.#cron = split.join(' ');
         }
         return this.#cron;
     }
 
     validate() {
-        if (isNaN(this.parsedCron.duration)) throw new Error('invalid duration')
+        if (isNaN(this.parsedCron.duration)) throw new Error('invalid duration');
         if (this.#isRateExpression) {
-            if ((this.parsedCron as ParsedRate).value <= 0) throw new Error('invalid value')
-            return
+            if ((this.parsedCron as ParsedRate).value <= 0) throw new Error('invalid value');
+            return;
             // rest is validated in parse
         }
-        const parsedCron = <ParsedCron>this.parsedCron
-        validateParsedRule(parsedCron.minutes)
-        validateParsedRule(parsedCron.hours)
-        validateParsedRule(parsedCron.daysOfMonth)
-        validateParsedRule(parsedCron.months)
-        validateParsedRule(parsedCron.daysOfWeek)
-        validateParsedRule(parsedCron.years)
+        const parsedCron = <ParsedCron>this.parsedCron;
+        validateParsedRule(parsedCron.minutes);
+        validateParsedRule(parsedCron.hours);
+        validateParsedRule(parsedCron.daysOfMonth);
+        validateParsedRule(parsedCron.months);
+        validateParsedRule(parsedCron.daysOfWeek);
+        validateParsedRule(parsedCron.years);
     }
 }
 
